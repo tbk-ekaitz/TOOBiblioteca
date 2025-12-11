@@ -295,7 +295,7 @@ public class FormListados : Form
             if (MessageBox.Show($"¿Está seguro de eliminar al usuario {usuario.NombreCompleto}?",
                 "Confirmar eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
-                var resultado = NegocioUsuarios.BajaUsuario(usuario.Id);
+                var resultado = NegocioUsuarios.BajaUsuario(usuario.DNI);
                 MessageBox.Show(resultado.mensaje,
                     resultado.exito ? "Éxito" : "Error",
                     MessageBoxButtons.OK,

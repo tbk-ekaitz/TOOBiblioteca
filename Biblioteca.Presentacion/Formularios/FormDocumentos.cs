@@ -272,7 +272,7 @@ public class FormDocumentos : Form
             d.Autor,
             d.Genero,
             Año = d.AnioPublicacion,
-            Disponibles = NegocioDocumentos.ContarEjemplaresDisponibles(d.Id),
+            Disponibles = NegocioDocumentos.ContarEjemplaresDisponibles(d.Codigo),
             Detalles = d is Libro libro ? $"{libro.NumeroPaginas} págs." :
                       d is Audiolibro audio ? audio.DuracionFormateada : ""
         }).ToList();
