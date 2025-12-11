@@ -6,22 +6,15 @@ namespace Biblioteca.Dominio;
 /// </summary>
 public class Ejemplar
 {
-    public int Id { get; set; }
+    /// <summary>
+    /// Código de barras único del ejemplar (identificador).
+    /// </summary>
+    public required string CodigoBarras { get; set; }
 
     /// <summary>
-    /// Código de barras único del ejemplar.
+    /// Referencia al documento al que pertenece este ejemplar.
     /// </summary>
-    public string CodigoBarras { get; set; } = string.Empty;
-
-    /// <summary>
-    /// ID del documento al que pertenece este ejemplar.
-    /// </summary>
-    public int DocumentoId { get; set; }
-
-    /// <summary>
-    /// Referencia al documento (para navegación).
-    /// </summary>
-    public Documento? Documento { get; set; }
+    public required Documento Documento { get; set; }
 
     /// <summary>
     /// Estado actual del ejemplar.
@@ -53,8 +46,18 @@ public class Ejemplar
     /// </summary>
     public bool EstaDisponible => Estado == EstadoEjemplar.Disponible;
 
+    /// <summary>
+    /// Indica si el ejemplar está actualmente prestado.
+    /// </summary>
+    public bool EstaPrestado => Estado == EstadoEjemplar.Prestado;
+
+    /// <summary>
+    /// Código del documento asociado (para búsquedas).
+    /// </summary>
+    public string CodigoDocumento => Documento.Codigo;
+
     public override string ToString()
     {
-        return $"{CodigoBarras} - {Documento?.Titulo ?? "Sin documento"} ({Estado})";
+        return $"{CodigoBarras} - {Documento.Titulo} ({Estado})";
     }
 }

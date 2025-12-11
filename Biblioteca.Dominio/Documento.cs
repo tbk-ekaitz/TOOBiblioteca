@@ -6,16 +6,14 @@ namespace Biblioteca.Dominio;
 /// </summary>
 public abstract class Documento
 {
-    public int Id { get; set; }
-
     /// <summary>
-    /// ISBN o código único del documento.
+    /// ISBN o código único del documento - identificador único.
     /// </summary>
-    public string Codigo { get; set; } = string.Empty;
+    public required string Codigo { get; set; }
 
-    public string Titulo { get; set; } = string.Empty;
+    public required string Titulo { get; set; }
 
-    public string Autor { get; set; } = string.Empty;
+    public required string Autor { get; set; }
 
     public string Editorial { get; set; } = string.Empty;
 

@@ -5,6 +5,7 @@ namespace Biblioteca.Datos;
 /// <summary>
 /// Repositorio central de datos simulados.
 /// Actúa como una base de datos en memoria con datos de prueba precargados.
+/// Utiliza identificadores string (DNI, Codigo, CodigoBarras, Id).
 /// </summary>
 public static class Repositorio
 {
@@ -16,11 +17,7 @@ public static class Repositorio
     private static List<Ejemplar> _ejemplares = new();
     private static List<Prestamo> _prestamos = new();
 
-    private static int _nextUsuarioId = 1;
-    private static int _nextEmpleadoId = 1;
-    private static int _nextDocumentoId = 1;
-    private static int _nextEjemplarId = 1;
-    private static int _nextPrestamoId = 1;
+    private static int _nextPrestamoNum = 1;
 
     #endregion
 
@@ -41,7 +38,6 @@ public static class Repositorio
         {
             new Empleado
             {
-                Id = _nextEmpleadoId++,
                 DNI = "12345678A",
                 Nombre = "Ana",
                 Apellidos = "García López",
@@ -55,7 +51,6 @@ public static class Repositorio
             },
             new Empleado
             {
-                Id = _nextEmpleadoId++,
                 DNI = "23456789B",
                 Nombre = "Carlos",
                 Apellidos = "Martínez Ruiz",
@@ -69,7 +64,6 @@ public static class Repositorio
             },
             new Empleado
             {
-                Id = _nextEmpleadoId++,
                 DNI = "34567890C",
                 Nombre = "María",
                 Apellidos = "Fernández Díaz",
@@ -90,7 +84,6 @@ public static class Repositorio
         {
             new Usuario
             {
-                Id = _nextUsuarioId++,
                 DNI = "11111111A",
                 Nombre = "Pedro",
                 Apellidos = "Sánchez Pérez",
@@ -101,7 +94,6 @@ public static class Repositorio
             },
             new Usuario
             {
-                Id = _nextUsuarioId++,
                 DNI = "22222222B",
                 Nombre = "Laura",
                 Apellidos = "López Gómez",
@@ -112,7 +104,6 @@ public static class Repositorio
             },
             new Usuario
             {
-                Id = _nextUsuarioId++,
                 DNI = "33333333C",
                 Nombre = "Miguel",
                 Apellidos = "Torres Vega",
@@ -125,7 +116,6 @@ public static class Repositorio
             },
             new Usuario
             {
-                Id = _nextUsuarioId++,
                 DNI = "44444444D",
                 Nombre = "Elena",
                 Apellidos = "Ruiz Navarro",
@@ -136,7 +126,6 @@ public static class Repositorio
             },
             new Usuario
             {
-                Id = _nextUsuarioId++,
                 DNI = "55555555E",
                 Nombre = "Javier",
                 Apellidos = "Moreno Castro",
@@ -155,7 +144,6 @@ public static class Repositorio
         {
             new Libro
             {
-                Id = _nextDocumentoId++,
                 Codigo = "LIB001",
                 ISBN = "978-84-376-0494-7",
                 Titulo = "Don Quijote de la Mancha",
@@ -169,7 +157,6 @@ public static class Repositorio
             },
             new Libro
             {
-                Id = _nextDocumentoId++,
                 Codigo = "LIB002",
                 ISBN = "978-84-204-8475-2",
                 Titulo = "Cien años de soledad",
@@ -183,7 +170,6 @@ public static class Repositorio
             },
             new Libro
             {
-                Id = _nextDocumentoId++,
                 Codigo = "LIB003",
                 ISBN = "978-84-339-7896-3",
                 Titulo = "1984",
@@ -196,7 +182,6 @@ public static class Repositorio
             },
             new Libro
             {
-                Id = _nextDocumentoId++,
                 Codigo = "LIB004",
                 ISBN = "978-84-450-7789-4",
                 Titulo = "El Principito",
@@ -209,7 +194,6 @@ public static class Repositorio
             },
             new Libro
             {
-                Id = _nextDocumentoId++,
                 Codigo = "LIB005",
                 ISBN = "978-84-233-4789-5",
                 Titulo = "La sombra del viento",
@@ -222,7 +206,6 @@ public static class Repositorio
             },
             new Libro
             {
-                Id = _nextDocumentoId++,
                 Codigo = "LIB006",
                 ISBN = "978-84-672-3456-6",
                 Titulo = "Rayuela",
@@ -235,7 +218,6 @@ public static class Repositorio
             },
             new Libro
             {
-                Id = _nextDocumentoId++,
                 Codigo = "LIB007",
                 ISBN = "978-84-9838-789-7",
                 Titulo = "El amor en los tiempos del cólera",
@@ -253,7 +235,6 @@ public static class Repositorio
         {
             new Audiolibro
             {
-                Id = _nextDocumentoId++,
                 Codigo = "AUD001",
                 Titulo = "Harry Potter y la piedra filosofal",
                 Autor = "J.K. Rowling",
@@ -266,7 +247,6 @@ public static class Repositorio
             },
             new Audiolibro
             {
-                Id = _nextDocumentoId++,
                 Codigo = "AUD002",
                 Titulo = "El nombre del viento",
                 Autor = "Patrick Rothfuss",
@@ -279,7 +259,6 @@ public static class Repositorio
             },
             new Audiolibro
             {
-                Id = _nextDocumentoId++,
                 Codigo = "AUD003",
                 Titulo = "Sapiens: De animales a dioses",
                 Autor = "Yuval Noah Harari",
@@ -299,37 +278,34 @@ public static class Repositorio
 
     private static void CargarEjemplares()
     {
+        int ejemplarNum = 1;
         foreach (var documento in _documentos)
         {
             // Crear 2-3 ejemplares por documento
-            int numEjemplares = documento.Id % 2 == 0 ? 3 : 2;
+            int numEjemplares = ejemplarNum % 2 == 0 ? 3 : 2;
 
             for (int i = 1; i <= numEjemplares; i++)
             {
                 _ejemplares.Add(new Ejemplar
                 {
-                    Id = _nextEjemplarId++,
                     CodigoBarras = $"{documento.Codigo}-{i:D2}",
-                    DocumentoId = documento.Id,
                     Documento = documento,
                     Estado = EstadoEjemplar.Disponible,
-                    Ubicacion = $"Estante {(char)('A' + (documento.Id % 5))}{documento.Id}, Fila {i}",
+                    Ubicacion = $"Estante {(char)('A' + (ejemplarNum % 5))}{ejemplarNum}, Fila {i}",
                     FechaAdquisicion = documento.FechaAlta.AddDays(-30)
                 });
             }
+            ejemplarNum++;
         }
     }
 
     private static void CargarPrestamosHistoricos()
     {
-        // Préstamo histórico devuelto
+        // Préstamo 1: Histórico devuelto
         var prestamo1 = new Prestamo
         {
-            Id = _nextPrestamoId++,
-            CodigoPrestamo = "PRE-2024-001",
-            UsuarioId = 1,
+            Id = GenerarIdPrestamo(),
             Usuario = _usuarios[0],
-            EmpleadoId = 2,
             Empleado = _empleados[1],
             FechaPrestamo = DateTime.Now.AddDays(-30),
             Estado = EstadoPrestamo.Devuelto,
@@ -339,14 +315,11 @@ public static class Repositorio
         prestamo1.CalcularFechaDevolucion();
         _ejemplares[0].VecesPrestado++;
 
-        // Préstamo activo
+        // Préstamo 2: Activo
         var prestamo2 = new Prestamo
         {
-            Id = _nextPrestamoId++,
-            CodigoPrestamo = "PRE-2024-002",
-            UsuarioId = 2,
+            Id = GenerarIdPrestamo(),
             Usuario = _usuarios[1],
-            EmpleadoId = 2,
             Empleado = _empleados[1],
             FechaPrestamo = DateTime.Now.AddDays(-5),
             Estado = EstadoPrestamo.Activo
@@ -357,14 +330,11 @@ public static class Repositorio
         prestamo2.CalcularFechaDevolucion();
         ejemplar2.VecesPrestado++;
 
-        // Préstamo activo con múltiples ejemplares
+        // Préstamo 3: Activo con múltiples ejemplares
         var prestamo3 = new Prestamo
         {
-            Id = _nextPrestamoId++,
-            CodigoPrestamo = "PRE-2024-003",
-            UsuarioId = 4,
+            Id = GenerarIdPrestamo(),
             Usuario = _usuarios[3],
-            EmpleadoId = 2,
             Empleado = _empleados[1],
             FechaPrestamo = DateTime.Now.AddDays(-3),
             Estado = EstadoPrestamo.Activo
@@ -379,14 +349,11 @@ public static class Repositorio
         ejemplar4.VecesPrestado++;
         ejemplar5.VecesPrestado++;
 
-        // Préstamo vencido (para pruebas de sanciones)
+        // Préstamo 4: Vencido (para pruebas de sanciones)
         var prestamo4 = new Prestamo
         {
-            Id = _nextPrestamoId++,
-            CodigoPrestamo = "PRE-2024-004",
-            UsuarioId = 3,
+            Id = GenerarIdPrestamo(),
             Usuario = _usuarios[2],
-            EmpleadoId = 2,
             Empleado = _empleados[1],
             FechaPrestamo = DateTime.Now.AddDays(-35),
             FechaDevolucionPrevista = DateTime.Now.AddDays(-14),
@@ -397,7 +364,27 @@ public static class Repositorio
         prestamo4.Ejemplares.Add(ejemplarVencido);
         ejemplarVencido.VecesPrestado++;
 
-        _prestamos.AddRange(new[] { prestamo1, prestamo2, prestamo3, prestamo4 });
+        // Préstamo 5: Audiolibro activo
+        var prestamo5 = new Prestamo
+        {
+            Id = GenerarIdPrestamo(),
+            Usuario = _usuarios[4],
+            Empleado = _empleados[0],
+            FechaPrestamo = DateTime.Now.AddDays(-2),
+            Estado = EstadoPrestamo.Activo
+        };
+        var ejemplarAudio = _ejemplares.First(e => e.Documento.Codigo.StartsWith("AUD"));
+        ejemplarAudio.Estado = EstadoEjemplar.Prestado;
+        prestamo5.Ejemplares.Add(ejemplarAudio);
+        prestamo5.CalcularFechaDevolucion();
+        ejemplarAudio.VecesPrestado++;
+
+        _prestamos.AddRange(new[] { prestamo1, prestamo2, prestamo3, prestamo4, prestamo5 });
+    }
+
+    private static string GenerarIdPrestamo()
+    {
+        return $"PRE-{DateTime.Now:yyyy}-{_nextPrestamoNum++:D3}";
     }
 
     #endregion
@@ -406,29 +393,34 @@ public static class Repositorio
 
     public static List<Usuario> ObtenerTodosUsuarios() => new(_usuarios);
 
-    public static Usuario? ObtenerUsuarioPorId(int id) =>
-        _usuarios.FirstOrDefault(u => u.Id == id);
+    public static Usuario? ObtenerUsuarioPorDNI(string dni)
+    {
+        if (string.IsNullOrWhiteSpace(dni)) return null;
+        return _usuarios.FirstOrDefault(u => u.DNI.Equals(dni.Trim(), StringComparison.OrdinalIgnoreCase));
+    }
 
-    public static Usuario? ObtenerUsuarioPorDNI(string dni) =>
-        _usuarios.FirstOrDefault(u => u.DNI.Equals(dni, StringComparison.OrdinalIgnoreCase));
+    public static bool ExisteUsuario(string dni)
+    {
+        if (string.IsNullOrWhiteSpace(dni)) return false;
+        return _usuarios.Any(u => u.DNI.Equals(dni.Trim(), StringComparison.OrdinalIgnoreCase));
+    }
 
     public static void InsertarUsuario(Usuario usuario)
     {
-        usuario.Id = _nextUsuarioId++;
         _usuarios.Add(usuario);
     }
 
     public static bool ActualizarUsuario(Usuario usuario)
     {
-        var index = _usuarios.FindIndex(u => u.Id == usuario.Id);
+        var index = _usuarios.FindIndex(u => u.DNI.Equals(usuario.DNI, StringComparison.OrdinalIgnoreCase));
         if (index < 0) return false;
         _usuarios[index] = usuario;
         return true;
     }
 
-    public static bool EliminarUsuario(int id)
+    public static bool EliminarUsuario(string dni)
     {
-        var usuario = _usuarios.FirstOrDefault(u => u.Id == id);
+        var usuario = ObtenerUsuarioPorDNI(dni);
         if (usuario == null) return false;
         return _usuarios.Remove(usuario);
     }
@@ -439,8 +431,11 @@ public static class Repositorio
 
     public static List<Empleado> ObtenerTodosEmpleados() => new(_empleados);
 
-    public static Empleado? ObtenerEmpleadoPorId(int id) =>
-        _empleados.FirstOrDefault(e => e.Id == id);
+    public static Empleado? ObtenerEmpleadoPorDNI(string dni)
+    {
+        if (string.IsNullOrWhiteSpace(dni)) return null;
+        return _empleados.FirstOrDefault(e => e.DNI.Equals(dni.Trim(), StringComparison.OrdinalIgnoreCase));
+    }
 
     public static Empleado? ValidarCredenciales(string nombreUsuario, string password) =>
         _empleados.FirstOrDefault(e =>
@@ -448,9 +443,14 @@ public static class Repositorio
             e.Password == password &&
             e.Activo);
 
+    public static Empleado? ValidarCredencialesPorDNI(string dni, string password) =>
+        _empleados.FirstOrDefault(e =>
+            e.DNI.Equals(dni, StringComparison.OrdinalIgnoreCase) &&
+            e.Password == password &&
+            e.Activo);
+
     public static void InsertarEmpleado(Empleado empleado)
     {
-        empleado.Id = _nextEmpleadoId++;
         _empleados.Add(empleado);
     }
 
@@ -466,29 +466,34 @@ public static class Repositorio
     public static List<Audiolibro> ObtenerTodosAudiolibros() =>
         _documentos.OfType<Audiolibro>().ToList();
 
-    public static Documento? ObtenerDocumentoPorId(int id) =>
-        _documentos.FirstOrDefault(d => d.Id == id);
+    public static Documento? ObtenerDocumentoPorCodigo(string codigo)
+    {
+        if (string.IsNullOrWhiteSpace(codigo)) return null;
+        return _documentos.FirstOrDefault(d => d.Codigo.Equals(codigo.Trim(), StringComparison.OrdinalIgnoreCase));
+    }
 
-    public static Documento? ObtenerDocumentoPorCodigo(string codigo) =>
-        _documentos.FirstOrDefault(d => d.Codigo.Equals(codigo, StringComparison.OrdinalIgnoreCase));
+    public static bool ExisteDocumento(string codigo)
+    {
+        if (string.IsNullOrWhiteSpace(codigo)) return false;
+        return _documentos.Any(d => d.Codigo.Equals(codigo.Trim(), StringComparison.OrdinalIgnoreCase));
+    }
 
     public static void InsertarDocumento(Documento documento)
     {
-        documento.Id = _nextDocumentoId++;
         _documentos.Add(documento);
     }
 
     public static bool ActualizarDocumento(Documento documento)
     {
-        var index = _documentos.FindIndex(d => d.Id == documento.Id);
+        var index = _documentos.FindIndex(d => d.Codigo.Equals(documento.Codigo, StringComparison.OrdinalIgnoreCase));
         if (index < 0) return false;
         _documentos[index] = documento;
         return true;
     }
 
-    public static bool EliminarDocumento(int id)
+    public static bool EliminarDocumento(string codigo)
     {
-        var documento = _documentos.FirstOrDefault(d => d.Id == id);
+        var documento = ObtenerDocumentoPorCodigo(codigo);
         if (documento == null) return false;
         return _documentos.Remove(documento);
     }
@@ -499,30 +504,39 @@ public static class Repositorio
 
     public static List<Ejemplar> ObtenerTodosEjemplares() => new(_ejemplares);
 
-    public static List<Ejemplar> ObtenerEjemplaresPorDocumento(int documentoId) =>
-        _ejemplares.Where(e => e.DocumentoId == documentoId).ToList();
+    public static List<Ejemplar> ObtenerEjemplaresPorDocumento(string codigoDocumento)
+    {
+        if (string.IsNullOrWhiteSpace(codigoDocumento)) return new List<Ejemplar>();
+        return _ejemplares.Where(e => e.Documento.Codigo.Equals(codigoDocumento.Trim(), StringComparison.OrdinalIgnoreCase)).ToList();
+    }
 
     public static List<Ejemplar> ObtenerEjemplaresDisponibles() =>
         _ejemplares.Where(e => e.Estado == EstadoEjemplar.Disponible).ToList();
 
-    public static Ejemplar? ObtenerEjemplarPorId(int id) =>
-        _ejemplares.FirstOrDefault(e => e.Id == id);
-
-    public static Ejemplar? ObtenerEjemplarPorCodigoBarras(string codigoBarras) =>
-        _ejemplares.FirstOrDefault(e => e.CodigoBarras.Equals(codigoBarras, StringComparison.OrdinalIgnoreCase));
+    public static Ejemplar? ObtenerEjemplarPorCodigoBarras(string codigoBarras)
+    {
+        if (string.IsNullOrWhiteSpace(codigoBarras)) return null;
+        return _ejemplares.FirstOrDefault(e => e.CodigoBarras.Equals(codigoBarras.Trim(), StringComparison.OrdinalIgnoreCase));
+    }
 
     public static void InsertarEjemplar(Ejemplar ejemplar)
     {
-        ejemplar.Id = _nextEjemplarId++;
         _ejemplares.Add(ejemplar);
     }
 
     public static bool ActualizarEjemplar(Ejemplar ejemplar)
     {
-        var index = _ejemplares.FindIndex(e => e.Id == ejemplar.Id);
+        var index = _ejemplares.FindIndex(e => e.CodigoBarras.Equals(ejemplar.CodigoBarras, StringComparison.OrdinalIgnoreCase));
         if (index < 0) return false;
         _ejemplares[index] = ejemplar;
         return true;
+    }
+
+    public static bool EliminarEjemplar(string codigoBarras)
+    {
+        var ejemplar = ObtenerEjemplarPorCodigoBarras(codigoBarras);
+        if (ejemplar == null) return false;
+        return _ejemplares.Remove(ejemplar);
     }
 
     #endregion
@@ -534,28 +548,48 @@ public static class Repositorio
     public static List<Prestamo> ObtenerPrestamosActivos() =>
         _prestamos.Where(p => p.Estado == EstadoPrestamo.Activo).ToList();
 
-    public static List<Prestamo> ObtenerPrestamosPorUsuario(int usuarioId) =>
-        _prestamos.Where(p => p.UsuarioId == usuarioId).ToList();
+    public static List<Prestamo> ObtenerPrestamosPorUsuario(string dni)
+    {
+        if (string.IsNullOrWhiteSpace(dni)) return new List<Prestamo>();
+        return _prestamos.Where(p => p.Usuario.DNI.Equals(dni.Trim(), StringComparison.OrdinalIgnoreCase)).ToList();
+    }
 
-    public static List<Prestamo> ObtenerPrestamosActivosPorUsuario(int usuarioId) =>
-        _prestamos.Where(p => p.UsuarioId == usuarioId && p.Estado == EstadoPrestamo.Activo).ToList();
+    public static List<Prestamo> ObtenerPrestamosActivosPorUsuario(string dni)
+    {
+        if (string.IsNullOrWhiteSpace(dni)) return new List<Prestamo>();
+        return _prestamos.Where(p =>
+            p.Usuario.DNI.Equals(dni.Trim(), StringComparison.OrdinalIgnoreCase) &&
+            p.Estado == EstadoPrestamo.Activo).ToList();
+    }
 
-    public static Prestamo? ObtenerPrestamoPorId(int id) =>
-        _prestamos.FirstOrDefault(p => p.Id == id);
+    public static Prestamo? ObtenerPrestamoPorId(string id)
+    {
+        if (string.IsNullOrWhiteSpace(id)) return null;
+        return _prestamos.FirstOrDefault(p => p.Id.Equals(id.Trim(), StringComparison.OrdinalIgnoreCase));
+    }
 
-    public static Prestamo? ObtenerPrestamoPorCodigo(string codigo) =>
-        _prestamos.FirstOrDefault(p => p.CodigoPrestamo.Equals(codigo, StringComparison.OrdinalIgnoreCase));
+    public static List<Prestamo> ObtenerPrestamosVencidos() =>
+        _prestamos.Where(p => p.Estado == EstadoPrestamo.Activo && p.EstaVencido).ToList();
+
+    public static List<Prestamo> ObtenerPrestamosDeDocumento(string codigoDocumento)
+    {
+        if (string.IsNullOrWhiteSpace(codigoDocumento)) return new List<Prestamo>();
+        return _prestamos.Where(p =>
+            p.Ejemplares.Any(e => e.Documento.Codigo.Equals(codigoDocumento.Trim(), StringComparison.OrdinalIgnoreCase))).ToList();
+    }
 
     public static void InsertarPrestamo(Prestamo prestamo)
     {
-        prestamo.Id = _nextPrestamoId++;
-        prestamo.CodigoPrestamo = $"PRE-{DateTime.Now:yyyy}-{prestamo.Id:D3}";
+        if (string.IsNullOrEmpty(prestamo.Id))
+        {
+            prestamo.Id = GenerarIdPrestamo();
+        }
         _prestamos.Add(prestamo);
     }
 
     public static bool ActualizarPrestamo(Prestamo prestamo)
     {
-        var index = _prestamos.FindIndex(p => p.Id == prestamo.Id);
+        var index = _prestamos.FindIndex(p => p.Id.Equals(prestamo.Id, StringComparison.OrdinalIgnoreCase));
         if (index < 0) return false;
         _prestamos[index] = prestamo;
         return true;
