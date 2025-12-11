@@ -6,23 +6,32 @@ namespace Biblioteca.Negocio;
 /// <summary>
 /// Lógica de negocio para la gestión de usuarios y empleados.
 /// Implementa validaciones, búsquedas LINQ y operaciones CRUD.
+/// Utiliza DNI como identificador único.
 /// </summary>
 public static class NegocioUsuarios
 {
     #region Autenticación
 
     /// <summary>
-    /// Valida las credenciales de un empleado para el login.
+    /// Valida las credenciales de un empleado para el login (por nombre de usuario).
     /// </summary>
-    /// <param name="nombreUsuario">Nombre de usuario</param>
-    /// <param name="password">Contraseña</param>
-    /// <returns>Empleado si las credenciales son válidas, null si no</returns>
     public static Empleado? ValidarLogin(string nombreUsuario, string password)
     {
         if (string.IsNullOrWhiteSpace(nombreUsuario) || string.IsNullOrWhiteSpace(password))
             return null;
 
         return Repositorio.ValidarCredenciales(nombreUsuario, password);
+    }
+
+    /// <summary>
+    /// Valida las credenciales de un empleado para el login (por DNI).
+    /// </summary>
+    public static Empleado? ValidarLoginPorDNI(string dni, string password)
+    {
+        if (string.IsNullOrWhiteSpace(dni) || string.IsNullOrWhiteSpace(password))
+            return null;
+
+        return Repositorio.ValidarCredencialesPorDNI(dni.Trim(), password);
     }
 
     /// <summary>
@@ -53,8 +62,24 @@ public static class NegocioUsuarios
     }
 
     /// <summary>
+    /// Verifica si existe un usuario con el DNI dado.
+    /// </summary>
+    public static bool ExisteUsuario(string dni)
+    {
+        if (string.IsNullOrWhiteSpace(dni)) return false;
+        return Repositorio.ExisteUsuario(dni.Trim());
+    }
+
+    /// <summary>
+    /// Obtiene todos los usuarios sin ordenar.
+    /// </summary>
+    public static List<Usuario> ObtenerTodos()
+    {
+        return Repositorio.ObtenerTodosUsuarios();
+    }
+
+    /// <summary>
     /// Obtiene todos los usuarios ordenados alfabéticamente por apellidos.
-    /// Utiliza LINQ OrderBy.
     /// </summary>
     public static List<Usuario> ObtenerTodosOrdenados()
     {
@@ -109,12 +134,12 @@ public static class NegocioUsuarios
     public static List<Usuario> ObtenerSinPrestamosActivos()
     {
         var usuariosConPrestamos = Repositorio.ObtenerPrestamosActivos()
-            .Select(p => p.UsuarioId)
+            .Select(p => p.Usuario.DNI)
             .Distinct()
             .ToHashSet();
 
         return Repositorio.ObtenerTodosUsuarios()
-            .Where(u => !usuariosConPrestamos.Contains(u.Id))
+            .Where(u => !usuariosConPrestamos.Contains(u.DNI))
             .OrderBy(u => u.Apellidos)
             .ToList();
     }
@@ -126,7 +151,7 @@ public static class NegocioUsuarios
     /// <summary>
     /// Valida los datos de un usuario antes de guardar.
     /// </summary>
-    public static (bool esValido, string mensaje) ValidarUsuario(Usuario usuario)
+    public static (bool esValido, string mensaje) ValidarUsuario(Usuario usuario, bool esNuevo = false)
     {
         if (string.IsNullOrWhiteSpace(usuario.DNI))
             return (false, "El DNI es obligatorio.");
@@ -141,8 +166,7 @@ public static class NegocioUsuarios
             return (false, "Los apellidos son obligatorios.");
 
         // Verificar DNI duplicado (solo para nuevos usuarios)
-        var existente = Repositorio.ObtenerUsuarioPorDNI(usuario.DNI);
-        if (existente != null && existente.Id != usuario.Id)
+        if (esNuevo && Repositorio.ExisteUsuario(usuario.DNI))
             return (false, "Ya existe un usuario con ese DNI.");
 
         return (true, "Datos válidos.");
@@ -172,7 +196,7 @@ public static class NegocioUsuarios
     /// </summary>
     public static (bool exito, string mensaje) AltaUsuario(Usuario usuario)
     {
-        var validacion = ValidarUsuario(usuario);
+        var validacion = ValidarUsuario(usuario, esNuevo: true);
         if (!validacion.esValido)
             return (false, validacion.mensaje);
 
@@ -186,11 +210,11 @@ public static class NegocioUsuarios
     /// </summary>
     public static (bool exito, string mensaje) ModificarUsuario(Usuario usuario)
     {
-        var existente = Repositorio.ObtenerUsuarioPorId(usuario.Id);
+        var existente = Repositorio.ObtenerUsuarioPorDNI(usuario.DNI);
         if (existente == null)
             return (false, "No se encontró el usuario a modificar.");
 
-        var validacion = ValidarUsuario(usuario);
+        var validacion = ValidarUsuario(usuario, esNuevo: false);
         if (!validacion.esValido)
             return (false, validacion.mensaje);
 
@@ -199,20 +223,20 @@ public static class NegocioUsuarios
     }
 
     /// <summary>
-    /// Da de baja un usuario (solo si no tiene préstamos activos).
+    /// Da de baja un usuario por DNI (solo si no tiene préstamos activos).
     /// </summary>
-    public static (bool exito, string mensaje) BajaUsuario(int usuarioId)
+    public static (bool exito, string mensaje) BajaUsuario(string dni)
     {
-        var usuario = Repositorio.ObtenerUsuarioPorId(usuarioId);
+        var usuario = Repositorio.ObtenerUsuarioPorDNI(dni);
         if (usuario == null)
             return (false, "No se encontró el usuario.");
 
         // Verificar préstamos activos
-        var prestamosActivos = Repositorio.ObtenerPrestamosActivosPorUsuario(usuarioId);
+        var prestamosActivos = Repositorio.ObtenerPrestamosActivosPorUsuario(dni);
         if (prestamosActivos.Count > 0)
             return (false, $"No se puede dar de baja al usuario. Tiene {prestamosActivos.Count} préstamo(s) activo(s).");
 
-        Repositorio.EliminarUsuario(usuarioId);
+        Repositorio.EliminarUsuario(dni);
         return (true, $"Usuario {usuario.NombreCompleto} dado de baja correctamente.");
     }
 
@@ -221,11 +245,11 @@ public static class NegocioUsuarios
     #region Sanciones
 
     /// <summary>
-    /// Aplica una sanción a un usuario.
+    /// Aplica una sanción a un usuario por DNI.
     /// </summary>
-    public static void AplicarSancion(int usuarioId, int diasSancion)
+    public static void AplicarSancion(string dni, int diasSancion)
     {
-        var usuario = Repositorio.ObtenerUsuarioPorId(usuarioId);
+        var usuario = Repositorio.ObtenerUsuarioPorDNI(dni);
         if (usuario == null) return;
 
         usuario.Sancionado = true;
@@ -234,11 +258,11 @@ public static class NegocioUsuarios
     }
 
     /// <summary>
-    /// Levanta la sanción de un usuario.
+    /// Levanta la sanción de un usuario por DNI.
     /// </summary>
-    public static void LevantarSancion(int usuarioId)
+    public static void LevantarSancion(string dni)
     {
-        var usuario = Repositorio.ObtenerUsuarioPorId(usuarioId);
+        var usuario = Repositorio.ObtenerUsuarioPorDNI(dni);
         if (usuario == null) return;
 
         usuario.Sancionado = false;
@@ -249,16 +273,16 @@ public static class NegocioUsuarios
     /// <summary>
     /// Verifica si un usuario puede realizar préstamos.
     /// </summary>
-    public static (bool puede, string motivo) PuedeRealizarPrestamo(int usuarioId)
+    public static (bool puede, string motivo) PuedeRealizarPrestamo(string dni)
     {
-        var usuario = Repositorio.ObtenerUsuarioPorId(usuarioId);
+        var usuario = Repositorio.ObtenerUsuarioPorDNI(dni);
         if (usuario == null)
             return (false, "Usuario no encontrado.");
 
         if (usuario.Sancionado && usuario.FechaFinSancion > DateTime.Now)
             return (false, $"Usuario sancionado hasta {usuario.FechaFinSancion:dd/MM/yyyy}.");
 
-        var prestamosActivos = Repositorio.ObtenerPrestamosActivosPorUsuario(usuarioId);
+        var prestamosActivos = Repositorio.ObtenerPrestamosActivosPorUsuario(dni);
         if (prestamosActivos.Count >= usuario.MaxPrestamos)
             return (false, $"El usuario ha alcanzado el máximo de {usuario.MaxPrestamos} préstamos simultáneos.");
 
@@ -277,21 +301,22 @@ public static class NegocioUsuarios
         var todosLosPrestamos = Repositorio.ObtenerTodosPrestamos();
         if (todosLosPrestamos.Count == 0) return null;
 
-        var usuarioMasActivo = todosLosPrestamos
-            .GroupBy(p => p.UsuarioId)
+        var dniMasActivo = todosLosPrestamos
+            .GroupBy(p => p.Usuario.DNI)
             .OrderByDescending(g => g.Count())
             .Select(g => g.Key)
             .FirstOrDefault();
 
-        return Repositorio.ObtenerUsuarioPorId(usuarioMasActivo);
+        if (string.IsNullOrEmpty(dniMasActivo)) return null;
+        return Repositorio.ObtenerUsuarioPorDNI(dniMasActivo);
     }
 
     /// <summary>
-    /// Cuenta préstamos históricos de un usuario.
+    /// Cuenta préstamos históricos de un usuario por DNI.
     /// </summary>
-    public static int ContarPrestamosUsuario(int usuarioId)
+    public static int ContarPrestamosUsuario(string dni)
     {
-        return Repositorio.ObtenerPrestamosPorUsuario(usuarioId).Count;
+        return Repositorio.ObtenerPrestamosPorUsuario(dni).Count;
     }
 
     #endregion

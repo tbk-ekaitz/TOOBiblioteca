@@ -218,7 +218,7 @@ public class FormAltaPrestamo : Form
             lblInfoUsuario.Text = $"DNI: {usuario.DNI} | Alta: {usuario.FechaAlta:dd/MM/yyyy}";
 
             // Verificar si puede pedir préstamos
-            var (puede, motivo) = NegocioUsuarios.PuedeRealizarPrestamo(usuario.Id);
+            var (puede, motivo) = NegocioUsuarios.PuedeRealizarPrestamo(usuario.DNI);
 
             if (puede)
             {
@@ -276,7 +276,7 @@ public class FormAltaPrestamo : Form
         }
 
         // Verificar duplicados
-        if (_ejemplaresSeleccionados.Any(e => e.Id == ejemplar.Id))
+        if (_ejemplaresSeleccionados.Any(e => e.CodigoBarras == ejemplar.CodigoBarras))
         {
             MessageBox.Show("Este ejemplar ya está en la lista.", "Aviso",
                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -343,10 +343,10 @@ public class FormAltaPrestamo : Form
             return;
 
         // Obtener el empleado actual (en una implementación real vendría del contexto)
-        var empleadoId = 2; // ID del empleado logueado
+        var empleadoDNI = "23456789B"; // DNI del empleado logueado (PersonalSala)
 
         // Validación final
-        var validacion = NegocioPrestamos.ValidarPrestamo(_usuarioSeleccionado.Id, _ejemplaresSeleccionados);
+        var validacion = NegocioPrestamos.ValidarPrestamo(_usuarioSeleccionado.DNI, _ejemplaresSeleccionados);
         if (!validacion.puede)
         {
             MessageBox.Show(validacion.motivo, "Error de Validación",
@@ -366,14 +366,14 @@ public class FormAltaPrestamo : Form
 
         // Registrar préstamo
         var (exito, mensaje, prestamo) = NegocioPrestamos.RegistrarPrestamo(
-            _usuarioSeleccionado.Id,
+            _usuarioSeleccionado.DNI,
             _ejemplaresSeleccionados,
-            empleadoId);
+            empleadoDNI);
 
         if (exito)
         {
             MessageBox.Show(
-                $"{mensaje}\n\nCódigo: {prestamo?.CodigoPrestamo}",
+                $"{mensaje}\n\nCódigo: {prestamo?.Id}",
                 "Préstamo Registrado",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);

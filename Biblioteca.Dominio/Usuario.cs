@@ -6,11 +6,12 @@ namespace Biblioteca.Dominio;
 /// </summary>
 public class Usuario
 {
-    public int Id { get; set; }
+    /// <summary>
+    /// DNI del usuario - identificador único.
+    /// </summary>
+    public required string DNI { get; set; }
 
-    public string DNI { get; set; } = string.Empty;
-
-    public string Nombre { get; set; } = string.Empty;
+    public required string Nombre { get; set; }
 
     public string Apellidos { get; set; } = string.Empty;
 

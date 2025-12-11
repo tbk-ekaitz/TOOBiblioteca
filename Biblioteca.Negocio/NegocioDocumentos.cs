@@ -6,6 +6,7 @@ namespace Biblioteca.Negocio;
 /// <summary>
 /// Lógica de negocio para la gestión del catálogo de documentos.
 /// Implementa CRUD, búsquedas avanzadas y estadísticas con LINQ.
+/// Utiliza Codigo como identificador único para documentos.
 /// </summary>
 public static class NegocioDocumentos
 {
@@ -107,12 +108,12 @@ public static class NegocioDocumentos
     {
         var ejemplaresDisponibles = Repositorio.ObtenerEjemplaresDisponibles();
         var documentosConDisponibles = ejemplaresDisponibles
-            .Select(e => e.DocumentoId)
+            .Select(e => e.Documento.Codigo)
             .Distinct()
             .ToHashSet();
 
         return Repositorio.ObtenerTodosDocumentos()
-            .Where(d => documentosConDisponibles.Contains(d.Id))
+            .Where(d => documentosConDisponibles.Contains(d.Codigo))
             .OrderBy(d => d.Titulo)
             .ToList();
     }
@@ -126,16 +127,25 @@ public static class NegocioDocumentos
         return Repositorio.ObtenerDocumentoPorCodigo(codigo.Trim());
     }
 
+    /// <summary>
+    /// Verifica si existe un documento con el código dado.
+    /// </summary>
+    public static bool ExisteDocumento(string codigo)
+    {
+        if (string.IsNullOrWhiteSpace(codigo)) return false;
+        return Repositorio.ExisteDocumento(codigo.Trim());
+    }
+
     #endregion
 
     #region Ejemplares
 
     /// <summary>
-    /// Obtiene ejemplares de un documento específico.
+    /// Obtiene ejemplares de un documento específico por código.
     /// </summary>
-    public static List<Ejemplar> ObtenerEjemplares(int documentoId)
+    public static List<Ejemplar> ObtenerEjemplares(string codigoDocumento)
     {
-        return Repositorio.ObtenerEjemplaresPorDocumento(documentoId)
+        return Repositorio.ObtenerEjemplaresPorDocumento(codigoDocumento)
             .OrderBy(e => e.CodigoBarras)
             .ToList();
     }
@@ -143,9 +153,9 @@ public static class NegocioDocumentos
     /// <summary>
     /// Obtiene ejemplares disponibles de un documento.
     /// </summary>
-    public static List<Ejemplar> ObtenerEjemplaresDisponibles(int documentoId)
+    public static List<Ejemplar> ObtenerEjemplaresDisponibles(string codigoDocumento)
     {
-        return Repositorio.ObtenerEjemplaresPorDocumento(documentoId)
+        return Repositorio.ObtenerEjemplaresPorDocumento(codigoDocumento)
             .Where(e => e.EstaDisponible)
             .OrderBy(e => e.CodigoBarras)
             .ToList();
@@ -163,10 +173,35 @@ public static class NegocioDocumentos
     /// <summary>
     /// Cuenta ejemplares disponibles de un documento.
     /// </summary>
-    public static int ContarEjemplaresDisponibles(int documentoId)
+    public static int ContarEjemplaresDisponibles(string codigoDocumento)
     {
-        return Repositorio.ObtenerEjemplaresPorDocumento(documentoId)
+        return Repositorio.ObtenerEjemplaresPorDocumento(codigoDocumento)
             .Count(e => e.EstaDisponible);
+    }
+
+    /// <summary>
+    /// Verifica si hay ejemplares disponibles de un documento.
+    /// </summary>
+    public static bool HayEjemplaresDisponibles(string codigoDocumento)
+    {
+        return ContarEjemplaresDisponibles(codigoDocumento) > 0;
+    }
+
+    /// <summary>
+    /// Obtiene la fecha estimada de disponibilidad de un documento.
+    /// Busca el préstamo activo con fecha de devolución más próxima.
+    /// </summary>
+    public static DateTime? ObtenerFechaDisponibilidad(string codigoDocumento)
+    {
+        if (HayEjemplaresDisponibles(codigoDocumento))
+            return DateTime.Now; // Ya está disponible
+
+        var prestamosDelDocumento = Repositorio.ObtenerPrestamosDeDocumento(codigoDocumento)
+            .Where(p => p.Estado == EstadoPrestamo.Activo)
+            .OrderBy(p => p.FechaDevolucionPrevista)
+            .FirstOrDefault();
+
+        return prestamosDelDocumento?.FechaDevolucionPrevista;
     }
 
     #endregion
@@ -176,7 +211,7 @@ public static class NegocioDocumentos
     /// <summary>
     /// Valida los datos de un documento.
     /// </summary>
-    public static (bool esValido, string mensaje) ValidarDocumento(Documento documento)
+    public static (bool esValido, string mensaje) ValidarDocumento(Documento documento, bool esNuevo = false)
     {
         if (string.IsNullOrWhiteSpace(documento.Codigo))
             return (false, "El código es obligatorio.");
@@ -187,9 +222,8 @@ public static class NegocioDocumentos
         if (string.IsNullOrWhiteSpace(documento.Autor))
             return (false, "El autor es obligatorio.");
 
-        // Verificar código duplicado
-        var existente = Repositorio.ObtenerDocumentoPorCodigo(documento.Codigo);
-        if (existente != null && existente.Id != documento.Id)
+        // Verificar código duplicado (solo para nuevos documentos)
+        if (esNuevo && Repositorio.ExisteDocumento(documento.Codigo))
             return (false, "Ya existe un documento con ese código.");
 
         return (true, "Datos válidos.");
@@ -200,7 +234,7 @@ public static class NegocioDocumentos
     /// </summary>
     public static (bool exito, string mensaje) AltaDocumento(Documento documento)
     {
-        var validacion = ValidarDocumento(documento);
+        var validacion = ValidarDocumento(documento, esNuevo: true);
         if (!validacion.esValido)
             return (false, validacion.mensaje);
 
@@ -214,11 +248,11 @@ public static class NegocioDocumentos
     /// </summary>
     public static (bool exito, string mensaje) ModificarDocumento(Documento documento)
     {
-        var existente = Repositorio.ObtenerDocumentoPorId(documento.Id);
+        var existente = Repositorio.ObtenerDocumentoPorCodigo(documento.Codigo);
         if (existente == null)
             return (false, "No se encontró el documento a modificar.");
 
-        var validacion = ValidarDocumento(documento);
+        var validacion = ValidarDocumento(documento, esNuevo: false);
         if (!validacion.esValido)
             return (false, validacion.mensaje);
 
@@ -227,41 +261,40 @@ public static class NegocioDocumentos
     }
 
     /// <summary>
-    /// Da de baja un documento (solo si no tiene ejemplares prestados).
+    /// Da de baja un documento por código (solo si no tiene ejemplares prestados).
     /// </summary>
-    public static (bool exito, string mensaje) BajaDocumento(int documentoId)
+    public static (bool exito, string mensaje) BajaDocumento(string codigoDocumento)
     {
-        var documento = Repositorio.ObtenerDocumentoPorId(documentoId);
+        var documento = Repositorio.ObtenerDocumentoPorCodigo(codigoDocumento);
         if (documento == null)
             return (false, "No se encontró el documento.");
 
-        var ejemplares = Repositorio.ObtenerEjemplaresPorDocumento(documentoId);
+        var ejemplares = Repositorio.ObtenerEjemplaresPorDocumento(codigoDocumento);
         var prestados = ejemplares.Count(e => e.Estado == EstadoEjemplar.Prestado);
 
         if (prestados > 0)
             return (false, $"No se puede dar de baja. Hay {prestados} ejemplar(es) prestado(s).");
 
-        Repositorio.EliminarDocumento(documentoId);
+        Repositorio.EliminarDocumento(codigoDocumento);
         return (true, $"Documento '{documento.Titulo}' dado de baja correctamente.");
     }
 
     /// <summary>
     /// Añade un nuevo ejemplar a un documento.
     /// </summary>
-    public static (bool exito, string mensaje) AltaEjemplar(int documentoId, string ubicacion)
+    public static (bool exito, string mensaje) AltaEjemplar(string codigoDocumento, string ubicacion)
     {
-        var documento = Repositorio.ObtenerDocumentoPorId(documentoId);
+        var documento = Repositorio.ObtenerDocumentoPorCodigo(codigoDocumento);
         if (documento == null)
             return (false, "No se encontró el documento.");
 
-        var ejemplaresExistentes = Repositorio.ObtenerEjemplaresPorDocumento(documentoId);
+        var ejemplaresExistentes = Repositorio.ObtenerEjemplaresPorDocumento(codigoDocumento);
         int siguiente = ejemplaresExistentes.Count + 1;
 
         var ejemplar = new Ejemplar
         {
-            DocumentoId = documentoId,
-            Documento = documento,
             CodigoBarras = $"{documento.Codigo}-{siguiente:D2}",
+            Documento = documento,
             Ubicacion = ubicacion,
             FechaAdquisicion = DateTime.Now,
             Estado = EstadoEjemplar.Disponible
@@ -271,29 +304,43 @@ public static class NegocioDocumentos
         return (true, $"Ejemplar {ejemplar.CodigoBarras} creado correctamente.");
     }
 
+    /// <summary>
+    /// Da de baja un ejemplar por código de barras (solo si no está prestado).
+    /// </summary>
+    public static (bool exito, string mensaje) BajaEjemplar(string codigoBarras)
+    {
+        var ejemplar = Repositorio.ObtenerEjemplarPorCodigoBarras(codigoBarras);
+        if (ejemplar == null)
+            return (false, "No se encontró el ejemplar.");
+
+        if (ejemplar.Estado == EstadoEjemplar.Prestado)
+            return (false, "No se puede dar de baja un ejemplar que está prestado.");
+
+        Repositorio.EliminarEjemplar(codigoBarras);
+        return (true, $"Ejemplar {codigoBarras} dado de baja correctamente.");
+    }
+
     #endregion
 
     #region Estadísticas con LINQ
 
     /// <summary>
     /// Obtiene el documento más leído (más veces prestado).
-    /// Utiliza GroupBy y Count.
     /// </summary>
     public static Documento? ObtenerMasLeido()
     {
         var todosPrestamos = Repositorio.ObtenerTodosPrestamos();
         if (todosPrestamos.Count == 0) return null;
 
-        // Contar préstamos por documento (a través de ejemplares)
-        var documentoMasLeido = todosPrestamos
+        var codigoMasLeido = todosPrestamos
             .SelectMany(p => p.Ejemplares)
-            .Where(e => e.Documento != null)
-            .GroupBy(e => e.DocumentoId)
+            .GroupBy(e => e.Documento.Codigo)
             .OrderByDescending(g => g.Count())
             .Select(g => g.Key)
             .FirstOrDefault();
 
-        return Repositorio.ObtenerDocumentoPorId(documentoMasLeido);
+        if (string.IsNullOrEmpty(codigoMasLeido)) return null;
+        return Repositorio.ObtenerDocumentoPorCodigo(codigoMasLeido);
     }
 
     /// <summary>
@@ -308,15 +355,39 @@ public static class NegocioDocumentos
 
         if (!prestamosDelMes.Any()) return null;
 
-        var documentoMasLeido = prestamosDelMes
+        var codigoMasLeido = prestamosDelMes
             .SelectMany(p => p.Ejemplares)
-            .Where(e => e.Documento != null)
-            .GroupBy(e => e.DocumentoId)
+            .GroupBy(e => e.Documento.Codigo)
             .OrderByDescending(g => g.Count())
             .Select(g => g.Key)
             .FirstOrDefault();
 
-        return Repositorio.ObtenerDocumentoPorId(documentoMasLeido);
+        if (string.IsNullOrEmpty(codigoMasLeido)) return null;
+        return Repositorio.ObtenerDocumentoPorCodigo(codigoMasLeido);
+    }
+
+    /// <summary>
+    /// Obtiene el documento más leído en un mes y año específicos.
+    /// </summary>
+    public static Documento? ObtenerMasLeidoMes(int mes, int anio)
+    {
+        var fechaInicio = new DateTime(anio, mes, 1);
+        var fechaFin = fechaInicio.AddMonths(1);
+
+        var prestamosDelMes = Repositorio.ObtenerTodosPrestamos()
+            .Where(p => p.FechaPrestamo >= fechaInicio && p.FechaPrestamo < fechaFin);
+
+        if (!prestamosDelMes.Any()) return null;
+
+        var codigoMasLeido = prestamosDelMes
+            .SelectMany(p => p.Ejemplares)
+            .GroupBy(e => e.Documento.Codigo)
+            .OrderByDescending(g => g.Count())
+            .Select(g => g.Key)
+            .FirstOrDefault();
+
+        if (string.IsNullOrEmpty(codigoMasLeido)) return null;
+        return Repositorio.ObtenerDocumentoPorCodigo(codigoMasLeido);
     }
 
     /// <summary>
@@ -326,8 +397,7 @@ public static class NegocioDocumentos
     {
         return Repositorio.ObtenerTodosPrestamos()
             .SelectMany(p => p.Ejemplares)
-            .Where(e => e.Documento != null)
-            .GroupBy(e => e.Documento!.Genero)
+            .GroupBy(e => e.Documento.Genero)
             .Select(g => (Genero: g.Key, Cantidad: g.Count()))
             .OrderByDescending(x => x.Cantidad)
             .ToList();
@@ -339,10 +409,10 @@ public static class NegocioDocumentos
     public static List<(Documento Documento, int VecesPrestado)> ObtenerTopPrestados(int cantidad = 5)
     {
         return Repositorio.ObtenerTodosEjemplares()
-            .Where(e => e.Documento != null && e.VecesPrestado > 0)
-            .GroupBy(e => e.DocumentoId)
+            .Where(e => e.VecesPrestado > 0)
+            .GroupBy(e => e.Documento.Codigo)
             .Select(g => (
-                Documento: Repositorio.ObtenerDocumentoPorId(g.Key)!,
+                Documento: Repositorio.ObtenerDocumentoPorCodigo(g.Key)!,
                 VecesPrestado: g.Sum(e => e.VecesPrestado)
             ))
             .Where(x => x.Documento != null)

@@ -123,7 +123,7 @@ public class FormGestionUsuario : Form
         if (!_esNuevo && _usuario != null)
         {
             // Cargar préstamos activos
-            var prestamos = NegocioPrestamos.ObtenerActivosPorUsuario(_usuario.Id);
+            var prestamos = NegocioPrestamos.ObtenerActivosPorUsuario(_usuario.DNI);
             lstPrestamos.Items.Clear();
 
             if (prestamos.Count == 0)
@@ -134,7 +134,7 @@ public class FormGestionUsuario : Form
             {
                 foreach (var p in prestamos)
                 {
-                    lstPrestamos.Items.Add($"{p.CodigoPrestamo} - {p.NumeroEjemplares} ejemplar(es) - Devolver: {p.FechaDevolucionPrevista:dd/MM/yyyy}");
+                    lstPrestamos.Items.Add($"{p.Id} - {p.NumeroEjemplares} ejemplar(es) - Devolver: {p.FechaDevolucionPrevista:dd/MM/yyyy}");
                 }
             }
 
@@ -172,7 +172,6 @@ public class FormGestionUsuario : Form
         }
         else
         {
-            usuario.Id = _usuario!.Id;
             var resultado = NegocioUsuarios.ModificarUsuario(usuario);
             if (resultado.exito)
             {

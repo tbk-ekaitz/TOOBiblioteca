@@ -32,7 +32,7 @@ public class Audiolibro : Documento
     public bool VersionAbreviada { get; set; } = false;
 
     /// <summary>
-    /// Los audiolibros tienen 14 días de préstamo (menos que libros físicos).
+    /// Los audiolibros tienen 14 días de préstamo.
     /// </summary>
     public override int GetDiasPrestamo() => 14;
 

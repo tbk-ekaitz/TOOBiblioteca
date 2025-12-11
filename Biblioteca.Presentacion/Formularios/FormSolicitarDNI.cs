@@ -161,7 +161,7 @@ public class FormSolicitarDNI : Form
                     return;
                 }
                 // Confirmar baja
-                var resultado = NegocioUsuarios.BajaUsuario(usuario.Id);
+                var resultado = NegocioUsuarios.BajaUsuario(usuario.DNI);
                 if (resultado.exito)
                 {
                     MessageBox.Show(resultado.mensaje, "Baja de Usuario",

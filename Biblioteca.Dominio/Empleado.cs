@@ -14,12 +14,12 @@ public class Empleado : Usuario
     /// <summary>
     /// Contraseña del empleado (en producción debería estar hasheada).
     /// </summary>
-    public string Password { get; set; } = string.Empty;
+    public required string Password { get; set; }
 
     /// <summary>
     /// Rol del empleado que determina sus permisos en el sistema.
     /// </summary>
-    public Role Rol { get; set; } = Role.PersonalSala;
+    public required Role Rol { get; set; }
 
     /// <summary>
     /// Fecha de contratación del empleado.
