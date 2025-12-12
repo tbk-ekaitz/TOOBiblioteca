@@ -20,6 +20,7 @@ public class FormGestionUsuario : Form
 
     private readonly bool _esNuevo;
     private Usuario? _usuario;
+    private string? _dniInicial;
 
     /// <summary>
     /// Constructor para edición de usuario existente.
@@ -37,7 +38,8 @@ public class FormGestionUsuario : Form
     /// </summary>
     public FormGestionUsuario(string dni)
     {
-        _usuario = new Usuario { DNI = dni };
+        _usuario = null; // No crear Usuario hasta guardar (evita error de required)
+        _dniInicial = dni;
         _esNuevo = true;
         InitializeComponent();
         CargarDatos(true);
@@ -117,6 +119,12 @@ public class FormGestionUsuario : Form
         ucDetalle.Usuario = _usuario;
         ucDetalle.SoloLectura = !editable;
         ucDetalle.DNIEditable = _esNuevo;
+
+        // Para alta de usuarios, prefill el DNI
+        if (_esNuevo && !string.IsNullOrEmpty(_dniInicial))
+        {
+            ucDetalle.EstablecerDNI(_dniInicial);
+        }
 
         btnGuardar.Visible = editable;
 

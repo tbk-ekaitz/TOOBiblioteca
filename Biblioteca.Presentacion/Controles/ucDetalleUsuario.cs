@@ -246,10 +246,22 @@ public partial class ucDetalleUsuario : UserControl
     /// </summary>
     public Usuario ObtenerDatos()
     {
-        var usuario = _usuario ?? new Usuario();
+        // Si no hay usuario existente, crear uno nuevo con los campos obligatorios
+        if (_usuario == null)
+        {
+            _usuario = new Usuario
+            {
+                DNI = txtDNI.Text.Trim().ToUpper(),
+                Nombre = txtNombre.Text.Trim()
+            };
+        }
+        else
+        {
+            _usuario.DNI = txtDNI.Text.Trim().ToUpper();
+            _usuario.Nombre = txtNombre.Text.Trim();
+        }
 
-        usuario.DNI = txtDNI.Text.Trim().ToUpper();
-        usuario.Nombre = txtNombre.Text.Trim();
+        var usuario = _usuario;
         usuario.Apellidos = txtApellidos.Text.Trim();
         usuario.Email = txtEmail.Text.Trim();
         usuario.Telefono = txtTelefono.Text.Trim();
@@ -331,6 +343,14 @@ public partial class ucDetalleUsuario : UserControl
     public void EnfocarDNI()
     {
         txtDNI.Focus();
+    }
+
+    /// <summary>
+    /// Establece el DNI inicial (para alta de usuarios).
+    /// </summary>
+    public void EstablecerDNI(string dni)
+    {
+        txtDNI.Text = dni;
     }
 
     #endregion

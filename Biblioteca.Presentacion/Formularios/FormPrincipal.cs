@@ -114,7 +114,6 @@ public class FormPrincipal : Form
             new ToolStripSeparator(),
             new ToolStripMenuItem("&Cerrar todas", null, CerrarTodas_Click)
         });
-        menuVentana.MdiWindowListItem = true;
 
         // Menú Ayuda
         menuAyuda = new ToolStripMenuItem("A&yuda");
