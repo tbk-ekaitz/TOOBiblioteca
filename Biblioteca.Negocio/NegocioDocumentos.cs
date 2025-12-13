@@ -214,7 +214,10 @@ public static class NegocioDocumentos
     public static (bool esValido, string mensaje) ValidarDocumento(Documento documento, bool esNuevo = false)
     {
         if (string.IsNullOrWhiteSpace(documento.Codigo))
-            return (false, "El código es obligatorio.");
+            return (false, "El ISBN es obligatorio.");
+
+        if (!ValidarFormatoISBN(documento.Codigo))
+            return (false, "El formato del ISBN no es válido. Debe tener 10 o 13 dígitos (puede incluir guiones).");
 
         if (string.IsNullOrWhiteSpace(documento.Titulo))
             return (false, "El título es obligatorio.");
@@ -224,9 +227,39 @@ public static class NegocioDocumentos
 
         // Verificar código duplicado (solo para nuevos documentos)
         if (esNuevo && Repositorio.ExisteDocumento(documento.Codigo))
-            return (false, "Ya existe un documento con ese código.");
+            return (false, "Ya existe un documento con ese ISBN.");
 
         return (true, "Datos válidos.");
+    }
+
+    /// <summary>
+    /// Valida el formato de un ISBN (10 o 13 dígitos, puede incluir guiones).
+    /// </summary>
+    public static bool ValidarFormatoISBN(string isbn)
+    {
+        if (string.IsNullOrWhiteSpace(isbn)) return false;
+
+        // Eliminar guiones y espacios
+        var soloDigitos = isbn.Replace("-", "").Replace(" ", "");
+
+        // ISBN-10: 10 caracteres (último puede ser X)
+        // ISBN-13: 13 dígitos
+        if (soloDigitos.Length == 10)
+        {
+            // Los primeros 9 deben ser dígitos, el último puede ser dígito o X
+            for (int i = 0; i < 9; i++)
+            {
+                if (!char.IsDigit(soloDigitos[i])) return false;
+            }
+            return char.IsDigit(soloDigitos[9]) || soloDigitos[9] == 'X' || soloDigitos[9] == 'x';
+        }
+        else if (soloDigitos.Length == 13)
+        {
+            // Todos deben ser dígitos
+            return soloDigitos.All(char.IsDigit);
+        }
+
+        return false;
     }
 
     /// <summary>

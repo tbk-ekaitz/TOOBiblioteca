@@ -139,13 +139,12 @@ public static class Repositorio
 
     private static void CargarDocumentos()
     {
-        // Libros
+        // Libros (Codigo = ISBN)
         var libros = new List<Libro>
         {
             new Libro
             {
-                Codigo = "LIB001",
-                ISBN = "978-84-376-0494-7",
+                Codigo = "978-84-376-0494-7",
                 Titulo = "Don Quijote de la Mancha",
                 Autor = "Miguel de Cervantes",
                 Editorial = "Cátedra",
@@ -157,8 +156,7 @@ public static class Repositorio
             },
             new Libro
             {
-                Codigo = "LIB002",
-                ISBN = "978-84-204-8475-2",
+                Codigo = "978-84-204-8475-2",
                 Titulo = "Cien años de soledad",
                 Autor = "Gabriel García Márquez",
                 Editorial = "Alfaguara",
@@ -170,8 +168,7 @@ public static class Repositorio
             },
             new Libro
             {
-                Codigo = "LIB003",
-                ISBN = "978-84-339-7896-3",
+                Codigo = "978-84-339-7896-3",
                 Titulo = "1984",
                 Autor = "George Orwell",
                 Editorial = "Debolsillo",
@@ -182,8 +179,7 @@ public static class Repositorio
             },
             new Libro
             {
-                Codigo = "LIB004",
-                ISBN = "978-84-450-7789-4",
+                Codigo = "978-84-450-7789-4",
                 Titulo = "El Principito",
                 Autor = "Antoine de Saint-Exupéry",
                 Editorial = "Salamandra",
@@ -194,8 +190,7 @@ public static class Repositorio
             },
             new Libro
             {
-                Codigo = "LIB005",
-                ISBN = "978-84-233-4789-5",
+                Codigo = "978-84-233-4789-5",
                 Titulo = "La sombra del viento",
                 Autor = "Carlos Ruiz Zafón",
                 Editorial = "Planeta",
@@ -206,8 +201,7 @@ public static class Repositorio
             },
             new Libro
             {
-                Codigo = "LIB006",
-                ISBN = "978-84-672-3456-6",
+                Codigo = "978-84-672-3456-6",
                 Titulo = "Rayuela",
                 Autor = "Julio Cortázar",
                 Editorial = "Cátedra",
@@ -218,8 +212,7 @@ public static class Repositorio
             },
             new Libro
             {
-                Codigo = "LIB007",
-                ISBN = "978-84-9838-789-7",
+                Codigo = "978-84-9838-789-7",
                 Titulo = "El amor en los tiempos del cólera",
                 Autor = "Gabriel García Márquez",
                 Editorial = "Debolsillo",
@@ -230,12 +223,12 @@ public static class Repositorio
             }
         };
 
-        // Audiolibros
+        // Audiolibros (Codigo = ISBN de edición audio)
         var audiolibros = new List<Audiolibro>
         {
             new Audiolibro
             {
-                Codigo = "AUD001",
+                Codigo = "978-84-9838-501-5",
                 Titulo = "Harry Potter y la piedra filosofal",
                 Autor = "J.K. Rowling",
                 Editorial = "Salamandra Audio",
@@ -247,7 +240,7 @@ public static class Repositorio
             },
             new Audiolibro
             {
-                Codigo = "AUD002",
+                Codigo = "978-84-01-35267-8",
                 Titulo = "El nombre del viento",
                 Autor = "Patrick Rothfuss",
                 Editorial = "Plaza & Janés Audio",
@@ -259,7 +252,7 @@ public static class Repositorio
             },
             new Audiolibro
             {
-                Codigo = "AUD003",
+                Codigo = "978-84-9992-468-3",
                 Titulo = "Sapiens: De animales a dioses",
                 Autor = "Yuval Noah Harari",
                 Editorial = "Debate Audio",

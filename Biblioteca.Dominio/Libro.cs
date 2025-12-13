@@ -12,11 +12,6 @@ public class Libro : Documento
     public int NumeroPaginas { get; set; }
 
     /// <summary>
-    /// ISBN-13 del libro.
-    /// </summary>
-    public string ISBN { get; set; } = string.Empty;
-
-    /// <summary>
     /// Edición del libro (ej: "1ª edición", "Edición revisada").
     /// </summary>
     public string Edicion { get; set; } = string.Empty;

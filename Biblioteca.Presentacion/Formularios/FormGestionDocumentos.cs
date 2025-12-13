@@ -11,14 +11,14 @@ public class FormGestionDocumentos : Form
     public enum Modo { Alta, Modificar }
 
     private Modo _modo;
-    private Label lblCodigo;
+    private Label lblISBN;
     private Label lblTitulo;
     private Label lblAutor;
     private Label lblEditorial;
     private Label lblGenero;
     private Label lblAnio;
     private Label lblTipo;
-    private TextBox txtCodigo;
+    private TextBox txtISBN;
     private TextBox txtTitulo;
     private TextBox txtAutor;
     private TextBox txtEditorial;
@@ -28,7 +28,6 @@ public class FormGestionDocumentos : Form
     private GroupBox grpLibro;
     private GroupBox grpAudiolibro;
     private NumericUpDown nudPaginas;
-    private TextBox txtISBN;
     private NumericUpDown nudDuracion;
     private TextBox txtNarrador;
     private ComboBox cmbFormato;
@@ -65,9 +64,9 @@ public class FormGestionDocumentos : Form
         cmbTipo.SelectedIndexChanged += CmbTipo_SelectedIndexChanged;
         y += spacing;
 
-        // Código
-        lblCodigo = new Label { Text = "Código:", Location = new Point(labelX, y), AutoSize = true };
-        txtCodigo = new TextBox { Location = new Point(controlX, y - 3), Width = 150 };
+        // ISBN
+        lblISBN = new Label { Text = "ISBN:", Location = new Point(labelX, y), AutoSize = true };
+        txtISBN = new TextBox { Location = new Point(controlX, y - 3), Width = 200 };
         y += spacing;
 
         // Título
@@ -96,13 +95,10 @@ public class FormGestionDocumentos : Form
         y += spacing + 10;
 
         // Grupo Libro
-        grpLibro = new GroupBox { Text = "Datos del Libro", Location = new Point(20, y), Size = new Size(440, 90) };
+        grpLibro = new GroupBox { Text = "Datos del Libro", Location = new Point(20, y), Size = new Size(440, 60) };
         grpLibro.Controls.Add(new Label { Text = "Páginas:", Location = new Point(15, 25), AutoSize = true });
         nudPaginas = new NumericUpDown { Location = new Point(100, 22), Width = 80, Minimum = 1, Maximum = 10000, Value = 100 };
         grpLibro.Controls.Add(nudPaginas);
-        grpLibro.Controls.Add(new Label { Text = "ISBN:", Location = new Point(15, 55), AutoSize = true });
-        txtISBN = new TextBox { Location = new Point(100, 52), Width = 200 };
-        grpLibro.Controls.Add(txtISBN);
 
         // Grupo Audiolibro
         grpAudiolibro = new GroupBox { Text = "Datos del Audiolibro", Location = new Point(20, y), Size = new Size(440, 90), Visible = false };
@@ -127,7 +123,7 @@ public class FormGestionDocumentos : Form
         btnCancelar = new Button { Text = "Cancelar", Location = new Point(260, y + 10), Size = new Size(90, 30) };
         btnCancelar.Click += (s, e) => Close();
 
-        Controls.AddRange(new Control[] { lblTipo, cmbTipo, lblCodigo, txtCodigo, lblTitulo, txtTitulo,
+        Controls.AddRange(new Control[] { lblTipo, cmbTipo, lblISBN, txtISBN, lblTitulo, txtTitulo,
             lblAutor, txtAutor, lblEditorial, txtEditorial, lblGenero, txtGenero, lblAnio, nudAnio,
             grpLibro, grpAudiolibro, btnGuardar, btnCancelar });
     }
@@ -142,9 +138,15 @@ public class FormGestionDocumentos : Form
     {
         errorProvider.Clear();
 
-        if (string.IsNullOrWhiteSpace(txtCodigo.Text))
+        if (string.IsNullOrWhiteSpace(txtISBN.Text))
         {
-            errorProvider.SetError(txtCodigo, "El código es obligatorio.");
+            errorProvider.SetError(txtISBN, "El ISBN es obligatorio.");
+            return;
+        }
+
+        if (!NegocioDocumentos.ValidarFormatoISBN(txtISBN.Text.Trim()))
+        {
+            errorProvider.SetError(txtISBN, "El formato del ISBN no es válido (10 o 13 dígitos).");
             return;
         }
 
@@ -165,21 +167,20 @@ public class FormGestionDocumentos : Form
         {
             documento = new Libro
             {
-                Codigo = txtCodigo.Text.Trim(),
+                Codigo = txtISBN.Text.Trim(),
                 Titulo = txtTitulo.Text.Trim(),
                 Autor = txtAutor.Text.Trim(),
                 Editorial = txtEditorial.Text.Trim(),
                 Genero = txtGenero.Text.Trim(),
                 AnioPublicacion = (int)nudAnio.Value,
-                NumeroPaginas = (int)nudPaginas.Value,
-                ISBN = txtISBN.Text.Trim()
+                NumeroPaginas = (int)nudPaginas.Value
             };
         }
         else
         {
             documento = new Audiolibro
             {
-                Codigo = txtCodigo.Text.Trim(),
+                Codigo = txtISBN.Text.Trim(),
                 Titulo = txtTitulo.Text.Trim(),
                 Autor = txtAutor.Text.Trim(),
                 Editorial = txtEditorial.Text.Trim(),
@@ -208,16 +209,15 @@ public class FormGestionDocumentos : Form
 
     private void LimpiarFormulario()
     {
-        txtCodigo.Clear();
+        txtISBN.Clear();
         txtTitulo.Clear();
         txtAutor.Clear();
         txtEditorial.Clear();
         txtGenero.Clear();
         nudAnio.Value = DateTime.Now.Year;
         nudPaginas.Value = 100;
-        txtISBN.Clear();
         nudDuracion.Value = 60;
         txtNarrador.Clear();
-        txtCodigo.Focus();
+        txtISBN.Focus();
     }
 }
