@@ -274,7 +274,8 @@ public class FormDocumentos : Form
             Año = d.AnioPublicacion,
             Disponibles = NegocioDocumentos.ContarEjemplaresDisponibles(d.Codigo),
             Detalles = d is Libro libro ? $"{libro.NumeroPaginas} págs." :
-                      d is Audiolibro audio ? audio.DuracionFormateada : ""
+                      d is Audiolibro audio ? audio.DuracionFormateada : "",
+            RegistradoPor = d.EmpleadoAlta?.NombreCompleto ?? "N/A"
         }).ToList();
 
         lblResultados.Text = $"{documentos.Count} documento(s)";

@@ -34,6 +34,11 @@ public abstract class Documento
     public DateTime FechaAlta { get; set; } = DateTime.Now;
 
     /// <summary>
+    /// Empleado que registró el documento en el sistema.
+    /// </summary>
+    public required Empleado EmpleadoAlta { get; set; }
+
+    /// <summary>
     /// Indica si el documento está disponible para préstamo.
     /// </summary>
     public bool Disponible { get; set; } = true;

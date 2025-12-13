@@ -336,12 +336,16 @@ public class FormPrincipal : Form
 
     private void AltaDocumento_Click(object? sender, EventArgs e)
     {
-        AbrirFormularioHijo<FormGestionDocumentos>(FormGestionDocumentos.Modo.Alta);
+        var form = new FormGestionDocumentos(FormGestionDocumentos.Modo.Alta, _empleadoActual);
+        form.MdiParent = this;
+        form.Show();
     }
 
     private void GestionEjemplares_Click(object? sender, EventArgs e)
     {
-        AbrirFormularioHijo<FormGestionEjemplares>();
+        var form = new FormGestionEjemplares(_empleadoActual);
+        form.MdiParent = this;
+        form.Show();
     }
 
     private void DocumentoMasLeido_Click(object? sender, EventArgs e)

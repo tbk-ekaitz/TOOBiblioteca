@@ -139,6 +139,9 @@ public static class Repositorio
 
     private static void CargarDocumentos()
     {
+        // Empleado que registró los documentos de prueba (admin)
+        var empleadoAlta = _empleados[0];
+
         // Libros (Codigo = ISBN)
         var libros = new List<Libro>
         {
@@ -152,7 +155,8 @@ public static class Repositorio
                 Genero = "Novela",
                 NumeroPaginas = 1250,
                 Edicion = "Edición conmemorativa",
-                Encuadernacion = "Tapa dura"
+                Encuadernacion = "Tapa dura",
+                EmpleadoAlta = empleadoAlta
             },
             new Libro
             {
@@ -164,7 +168,8 @@ public static class Repositorio
                 Genero = "Realismo mágico",
                 NumeroPaginas = 496,
                 Edicion = "50 aniversario",
-                Encuadernacion = "Tapa blanda"
+                Encuadernacion = "Tapa blanda",
+                EmpleadoAlta = empleadoAlta
             },
             new Libro
             {
@@ -175,7 +180,8 @@ public static class Repositorio
                 AnioPublicacion = 1949,
                 Genero = "Distopía",
                 NumeroPaginas = 352,
-                Encuadernacion = "Tapa blanda"
+                Encuadernacion = "Tapa blanda",
+                EmpleadoAlta = empleadoAlta
             },
             new Libro
             {
@@ -186,7 +192,8 @@ public static class Repositorio
                 AnioPublicacion = 1943,
                 Genero = "Fábula",
                 NumeroPaginas = 96,
-                Encuadernacion = "Tapa dura"
+                Encuadernacion = "Tapa dura",
+                EmpleadoAlta = empleadoAlta
             },
             new Libro
             {
@@ -197,7 +204,8 @@ public static class Repositorio
                 AnioPublicacion = 2001,
                 Genero = "Misterio",
                 NumeroPaginas = 576,
-                Encuadernacion = "Tapa blanda"
+                Encuadernacion = "Tapa blanda",
+                EmpleadoAlta = empleadoAlta
             },
             new Libro
             {
@@ -208,7 +216,8 @@ public static class Repositorio
                 AnioPublicacion = 1963,
                 Genero = "Novela experimental",
                 NumeroPaginas = 736,
-                Encuadernacion = "Tapa blanda"
+                Encuadernacion = "Tapa blanda",
+                EmpleadoAlta = empleadoAlta
             },
             new Libro
             {
@@ -219,7 +228,8 @@ public static class Repositorio
                 AnioPublicacion = 1985,
                 Genero = "Romance",
                 NumeroPaginas = 496,
-                Encuadernacion = "Tapa blanda"
+                Encuadernacion = "Tapa blanda",
+                EmpleadoAlta = empleadoAlta
             }
         };
 
@@ -236,7 +246,8 @@ public static class Repositorio
                 Genero = "Fantasía",
                 Narrador = "Carlos Ponce",
                 DuracionMinutos = 520,
-                Formato = FormatoAudio.MP3
+                Formato = FormatoAudio.MP3,
+                EmpleadoAlta = empleadoAlta
             },
             new Audiolibro
             {
@@ -248,7 +259,8 @@ public static class Repositorio
                 Genero = "Fantasía épica",
                 Narrador = "Raúl Llorens",
                 DuracionMinutos = 1680,
-                Formato = FormatoAudio.MP3
+                Formato = FormatoAudio.MP3,
+                EmpleadoAlta = empleadoAlta
             },
             new Audiolibro
             {
@@ -261,7 +273,8 @@ public static class Repositorio
                 Narrador = "Miguel Ángel Jenner",
                 DuracionMinutos = 900,
                 Formato = FormatoAudio.AAC,
-                NumeroDiscos = 2
+                NumeroDiscos = 2,
+                EmpleadoAlta = empleadoAlta
             }
         };
 
@@ -271,6 +284,9 @@ public static class Repositorio
 
     private static void CargarEjemplares()
     {
+        // Empleado que registró los ejemplares de prueba (admin)
+        var empleadoAlta = _empleados[0];
+
         int ejemplarNum = 1;
         foreach (var documento in _documentos)
         {
@@ -285,7 +301,8 @@ public static class Repositorio
                     Documento = documento,
                     Estado = EstadoEjemplar.Disponible,
                     Ubicacion = $"Estante {(char)('A' + (ejemplarNum % 5))}{ejemplarNum}, Fila {i}",
-                    FechaAdquisicion = documento.FechaAlta.AddDays(-30)
+                    FechaAdquisicion = documento.FechaAlta.AddDays(-30),
+                    EmpleadoAlta = empleadoAlta
                 });
             }
             ejemplarNum++;

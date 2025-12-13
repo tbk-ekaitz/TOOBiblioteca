@@ -265,12 +265,17 @@ public static class NegocioDocumentos
     /// <summary>
     /// Da de alta un nuevo documento.
     /// </summary>
-    public static (bool exito, string mensaje) AltaDocumento(Documento documento)
+    public static (bool exito, string mensaje) AltaDocumento(Documento documento, string dniEmpleado)
     {
+        var empleado = Repositorio.ObtenerEmpleadoPorDNI(dniEmpleado);
+        if (empleado == null)
+            return (false, "Empleado no encontrado.");
+
         var validacion = ValidarDocumento(documento, esNuevo: true);
         if (!validacion.esValido)
             return (false, validacion.mensaje);
 
+        documento.EmpleadoAlta = empleado;
         documento.FechaAlta = DateTime.Now;
         Repositorio.InsertarDocumento(documento);
         return (true, $"Documento '{documento.Titulo}' dado de alta correctamente.");
@@ -315,8 +320,12 @@ public static class NegocioDocumentos
     /// <summary>
     /// Añade un nuevo ejemplar a un documento.
     /// </summary>
-    public static (bool exito, string mensaje) AltaEjemplar(string codigoDocumento, string ubicacion)
+    public static (bool exito, string mensaje) AltaEjemplar(string codigoDocumento, string ubicacion, string dniEmpleado)
     {
+        var empleado = Repositorio.ObtenerEmpleadoPorDNI(dniEmpleado);
+        if (empleado == null)
+            return (false, "Empleado no encontrado.");
+
         var documento = Repositorio.ObtenerDocumentoPorCodigo(codigoDocumento);
         if (documento == null)
             return (false, "No se encontró el documento.");
@@ -330,7 +339,8 @@ public static class NegocioDocumentos
             Documento = documento,
             Ubicacion = ubicacion,
             FechaAdquisicion = DateTime.Now,
-            Estado = EstadoEjemplar.Disponible
+            Estado = EstadoEjemplar.Disponible,
+            EmpleadoAlta = empleado
         };
 
         Repositorio.InsertarEjemplar(ejemplar);

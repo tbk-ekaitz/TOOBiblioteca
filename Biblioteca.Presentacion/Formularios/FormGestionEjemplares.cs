@@ -8,6 +8,7 @@ namespace Biblioteca.Presentacion.Formularios;
 /// </summary>
 public class FormGestionEjemplares : Form
 {
+    private Empleado _empleado;
     private Label lblCodigo;
     private TextBox txtCodigo;
     private Button btnBuscar;
@@ -24,8 +25,9 @@ public class FormGestionEjemplares : Form
     private Button btnBajaEjemplar;
     private ErrorProvider errorProvider;
 
-    public FormGestionEjemplares()
+    public FormGestionEjemplares(Empleado empleado)
     {
+        _empleado = empleado;
         InitializeComponent();
     }
 
@@ -126,7 +128,7 @@ public class FormGestionEjemplares : Form
             return;
         }
 
-        var (exito, mensaje) = NegocioDocumentos.AltaEjemplar(txtCodigo.Text.Trim(), txtUbicacion.Text.Trim());
+        var (exito, mensaje) = NegocioDocumentos.AltaEjemplar(txtCodigo.Text.Trim(), txtUbicacion.Text.Trim(), _empleado.DNI);
 
         if (exito)
         {

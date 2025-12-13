@@ -32,6 +32,11 @@ public class Ejemplar
     public DateTime FechaAdquisicion { get; set; } = DateTime.Now;
 
     /// <summary>
+    /// Empleado que registró el ejemplar en el sistema.
+    /// </summary>
+    public required Empleado EmpleadoAlta { get; set; }
+
+    /// <summary>
     /// Observaciones sobre el estado físico del ejemplar.
     /// </summary>
     public string Observaciones { get; set; } = string.Empty;

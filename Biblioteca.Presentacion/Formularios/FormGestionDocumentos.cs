@@ -11,6 +11,7 @@ public class FormGestionDocumentos : Form
     public enum Modo { Alta, Modificar }
 
     private Modo _modo;
+    private Empleado _empleado;
     private Label lblISBN;
     private Label lblTitulo;
     private Label lblAutor;
@@ -35,9 +36,10 @@ public class FormGestionDocumentos : Form
     private Button btnCancelar;
     private ErrorProvider errorProvider;
 
-    public FormGestionDocumentos(Modo modo)
+    public FormGestionDocumentos(Modo modo, Empleado empleado)
     {
         _modo = modo;
+        _empleado = empleado;
         InitializeComponent();
     }
 
@@ -193,7 +195,7 @@ public class FormGestionDocumentos : Form
         }
 
         var (exito, mensaje) = _modo == Modo.Alta
-            ? NegocioDocumentos.AltaDocumento(documento)
+            ? NegocioDocumentos.AltaDocumento(documento, _empleado.DNI)
             : NegocioDocumentos.ModificarDocumento(documento);
 
         if (exito)
