@@ -348,7 +348,7 @@ public static class NegocioDocumentos
     }
 
     /// <summary>
-    /// Da de baja un ejemplar por código de barras (solo si no está prestado).
+    /// Da de baja un ejemplar por código de barras (borrado lógico - solo si no está prestado).
     /// </summary>
     public static (bool exito, string mensaje) BajaEjemplar(string codigoBarras)
     {
@@ -359,8 +359,33 @@ public static class NegocioDocumentos
         if (ejemplar.Estado == EstadoEjemplar.Prestado)
             return (false, "No se puede dar de baja un ejemplar que está prestado.");
 
-        Repositorio.EliminarEjemplar(codigoBarras);
+        if (ejemplar.Estado == EstadoEjemplar.Baja)
+            return (false, "El ejemplar ya está dado de baja.");
+
+        // Borrado lógico: cambiar estado en vez de eliminar físicamente
+        ejemplar.Estado = EstadoEjemplar.Baja;
+        Repositorio.ActualizarEjemplar(ejemplar);
         return (true, $"Ejemplar {codigoBarras} dado de baja correctamente.");
+    }
+
+    /// <summary>
+    /// Obtiene ejemplares activos (no dados de baja) de un documento.
+    /// </summary>
+    public static List<Ejemplar> ObtenerEjemplaresActivos(string codigoDocumento)
+    {
+        return Repositorio.ObtenerEjemplaresPorDocumento(codigoDocumento)
+            .Where(e => e.Estado != EstadoEjemplar.Baja)
+            .OrderBy(e => e.CodigoBarras)
+            .ToList();
+    }
+
+    /// <summary>
+    /// Cuenta ejemplares activos (no dados de baja) de un documento.
+    /// </summary>
+    public static int ContarEjemplaresActivos(string codigoDocumento)
+    {
+        return Repositorio.ObtenerEjemplaresPorDocumento(codigoDocumento)
+            .Count(e => e.Estado != EstadoEjemplar.Baja);
     }
 
     #endregion

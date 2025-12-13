@@ -64,6 +64,7 @@ public class FormGestionEjemplares : Form
             SelectionMode = DataGridViewSelectionMode.FullRowSelect,
             AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
         };
+        dgvEjemplares.CellFormatting += DgvEjemplares_CellFormatting;
 
         // Grupo nuevo ejemplar
         grpNuevoEjemplar = new GroupBox { Text = "Nuevo Ejemplar", Location = new Point(20, 340), Size = new Size(400, 60), Enabled = false };
@@ -179,5 +180,18 @@ public class FormGestionEjemplares : Form
         grpDocumento.Enabled = false;
         grpNuevoEjemplar.Enabled = false;
         btnBajaEjemplar.Enabled = false;
+    }
+
+    private void DgvEjemplares_CellFormatting(object? sender, DataGridViewCellFormattingEventArgs e)
+    {
+        if (dgvEjemplares.Columns[e.ColumnIndex].Name == "Estado")
+        {
+            if (e.Value?.ToString() == "Baja")
+            {
+                // Colorear toda la fila en gris para indicar que está dado de baja
+                dgvEjemplares.Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.LightGray;
+                dgvEjemplares.Rows[e.RowIndex].DefaultCellStyle.ForeColor = Color.DarkGray;
+            }
+        }
     }
 }

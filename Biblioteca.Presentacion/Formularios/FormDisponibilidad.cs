@@ -107,26 +107,27 @@ public class FormDisponibilidad : Form
         txtAutor.Text = documento.Autor;
         txtTipo.Text = documento.TipoDocumento;
 
+        // Usar solo ejemplares activos (excluir dados de baja)
         var ejemplaresDisponibles = NegocioDocumentos.ContarEjemplaresDisponibles(documento.Codigo);
-        var totalEjemplares = NegocioDocumentos.ObtenerEjemplares(documento.Codigo).Count;
+        var totalEjemplaresActivos = NegocioDocumentos.ContarEjemplaresActivos(documento.Codigo);
 
         if (ejemplaresDisponibles > 0)
         {
-            txtDisponibilidad.Text = $"Disponible ({ejemplaresDisponibles} de {totalEjemplares})";
+            txtDisponibilidad.Text = $"Disponible ({ejemplaresDisponibles} de {totalEjemplaresActivos})";
             txtDisponibilidad.BackColor = Color.LightGreen;
             txtFechaDisponible.Text = "Ahora";
         }
         else
         {
-            txtDisponibilidad.Text = $"No disponible (0 de {totalEjemplares})";
+            txtDisponibilidad.Text = $"No disponible (0 de {totalEjemplaresActivos})";
             txtDisponibilidad.BackColor = Color.LightCoral;
 
             var fechaDisponible = NegocioDocumentos.ObtenerFechaDisponibilidad(documento.Codigo);
             txtFechaDisponible.Text = fechaDisponible?.ToString("dd/MM/yyyy") ?? "Desconocida";
         }
 
-        // Cargar ejemplares
-        var ejemplares = NegocioDocumentos.ObtenerEjemplares(documento.Codigo);
+        // Cargar solo ejemplares activos (sin los dados de baja)
+        var ejemplares = NegocioDocumentos.ObtenerEjemplaresActivos(documento.Codigo);
         dgvEjemplares.DataSource = ejemplares.Select(ej => new
         {
             ej.CodigoBarras,
