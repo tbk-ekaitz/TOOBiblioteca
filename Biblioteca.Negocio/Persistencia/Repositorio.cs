@@ -1,13 +1,13 @@
 using Biblioteca.Dominio;
 
-namespace Biblioteca.Datos;
+namespace Biblioteca.Negocio.Persistencia;
 
 /// <summary>
 /// Repositorio central de datos simulados.
 /// Actúa como una base de datos en memoria con datos de prueba precargados.
 /// Utiliza identificadores string (DNI, Codigo, CodigoBarras, Id).
 /// </summary>
-public static class Repositorio
+internal static class Repositorio
 {
     #region Colecciones de Datos
 
