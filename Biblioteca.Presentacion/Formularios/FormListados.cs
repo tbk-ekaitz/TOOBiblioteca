@@ -130,6 +130,8 @@ public class FormListados : Form
             BindingSource = bsUsuarios,
             Location = new Point(15, 20)
         };
+        navUsuarios.AddNewItem.Visible = false;
+        navUsuarios.DeleteItem.Visible = false;
 
         // Campos de detalle
         int y = 70;

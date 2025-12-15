@@ -78,6 +78,8 @@ public class FormListadoPrestamos : Form
             };
         }
 
+        bindingNavigator.DeleteItem.ToolTipText = "Hide";
+
         // DataGridView
         dgvPrestamos = new DataGridView
         {

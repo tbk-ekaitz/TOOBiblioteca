@@ -89,6 +89,7 @@ public class FormSolicitarDNI : Form
             Size = new Size(80, 28),
             DialogResult = DialogResult.Cancel
         };
+        btnCancelar.Click += BtnCancelar_Click;
 
         lblMensaje = new Label
         {
@@ -104,6 +105,11 @@ public class FormSolicitarDNI : Form
 
         AcceptButton = btnAceptar;
         CancelButton = btnCancelar;
+    }
+
+    private void BtnCancelar_Click(object? sender, EventArgs e)
+    {
+        txtDNI.Text = "";
     }
 
     private void BtnAceptar_Click(object? sender, EventArgs e)

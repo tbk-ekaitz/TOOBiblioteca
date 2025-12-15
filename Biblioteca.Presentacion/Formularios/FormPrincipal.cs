@@ -36,6 +36,7 @@ public class FormPrincipal : Form
     private ToolStripButton tsbDevolucion;
     private ToolStripButton tsbPrestamosVencidos;
     private ToolStripButton tsbCerrarSesion;
+    private ToolStripButton tsbCerrarPrograma;
 
     private ToolStripMenuItem itemEstadisticas;
     private ToolStripMenuItem itemAltaDocumento;
@@ -157,14 +158,16 @@ public class FormPrincipal : Form
         tsbNuevoPrestamo = CrearBotonToolbar("Nuevo Préstamo", NuevoPrestamo_Click);
         tsbDevolucion = CrearBotonToolbar("Devolución", RegistrarDevolucion_Click);
         tsbPrestamosVencidos = CrearBotonToolbar("Vencidos", PrestamosVencidos_Click);
-        tsbCerrarSesion = CrearBotonToolbar("Salir", CerrarSesion_Click);
+        tsbCerrarSesion = CrearBotonToolbar("Cerrar sesion", CerrarSesion_Click);
+        tsbCerrarPrograma = CrearBotonToolbar("Salir", Salir_Click);
         tsbCerrarSesion.Alignment = ToolStripItemAlignment.Right;
+        tsbCerrarPrograma.Alignment = ToolStripItemAlignment.Right;
 
         toolStripPrincipal.Items.AddRange(new ToolStripItem[] {
             tsbNuevoUsuario, tsbBuscarUsuario, new ToolStripSeparator(),
             tsbNuevoDocumento, tsbVerCatalogo, tsbEstadisticas, new ToolStripSeparator(),
             tsbNuevoPrestamo, tsbDevolucion, tsbPrestamosVencidos, new ToolStripSeparator(),
-            tsbCerrarSesion
+            tsbCerrarPrograma, tsbCerrarSesion, 
         });
 
 
@@ -261,12 +264,14 @@ public class FormPrincipal : Form
             MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
         {
             foreach (Form child in MdiChildren) child.Close();
-            Hide();
-            using (var formLogin = new FormLogin())
-            {
-                if (formLogin.ShowDialog() == DialogResult.OK && formLogin.EmpleadoLogueado != null) Application.Restart();
-                else Application.Exit();
-            }
+            //Hide();
+            //using (var formLogin = new FormLogin())
+            //{
+            //    if (formLogin.ShowDialog() == DialogResult.OK && formLogin.EmpleadoLogueado != null) Application.Restart();
+            //    else Application.Exit();
+            //}
+            Application.Restart();
+            Environment.Exit(0);
         }
     }
 
@@ -323,8 +328,7 @@ public class FormPrincipal : Form
     private void AcercaDe_Click(object? sender, EventArgs e)
     {
         MessageBox.Show(
-            "Sistema de Gestión de Biblioteca\n" +
-            "Versión 1.0\n\n" +
+            "Sistema de Gestión de Biblioteca\n\n\n" +
             $"Usuario actual: {_empleadoActual.NombreCompleto}\n" +
             $"Rol: {_empleadoActual.Rol}",
             "Acerca de",
