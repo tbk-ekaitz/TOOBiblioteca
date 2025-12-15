@@ -145,17 +145,18 @@ public class FormPrincipal : Form
 
         // Botones separados para Catálogo y Estadísticas
         tsbVerCatalogo = CrearBotonToolbar("Catálogo", VerCatalogo_Click);
-        tsbEstadisticas = CrearBotonToolbar("Estadísticas", VerEstadisticas_Click); // NUEVO
+        tsbEstadisticas = CrearBotonToolbar("Estadísticas", VerEstadisticas_Click);
 
         tsbNuevoPrestamo = CrearBotonToolbar("Nuevo Préstamo", NuevoPrestamo_Click);
         tsbDevolucion = CrearBotonToolbar("Devolución", RegistrarDevolucion_Click);
+        tsbPrestamosVencidos = CrearBotonToolbar("Vencidos", PrestamosVencidos_Click);
         tsbCerrarSesion = CrearBotonToolbar("Salir", CerrarSesion_Click);
         tsbCerrarSesion.Alignment = ToolStripItemAlignment.Right;
 
         toolStripPrincipal.Items.AddRange(new ToolStripItem[] {
             tsbNuevoUsuario, tsbBuscarUsuario, new ToolStripSeparator(),
             tsbNuevoDocumento, tsbVerCatalogo, tsbEstadisticas, new ToolStripSeparator(),
-            tsbNuevoPrestamo, tsbDevolucion, new ToolStripSeparator(),
+            tsbNuevoPrestamo, tsbDevolucion, tsbPrestamosVencidos, new ToolStripSeparator(),
             tsbCerrarSesion
         });
 
@@ -210,6 +211,7 @@ public class FormPrincipal : Form
                 menuCatalogo.Visible = false;
                 tsbNuevoDocumento.Visible = false;
                 tsbVerCatalogo.Visible = false;
+                tsbEstadisticas.Visible = false;
                 break;
 
             case Role.PersonalAdquisiciones:
