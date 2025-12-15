@@ -22,9 +22,9 @@ public class Libro : Documento
     public string Encuadernacion { get; set; } = "Tapa blanda";
 
     /// <summary>
-    /// Los libros tienen 21 días de préstamo estándar.
+    /// Los libros tienen 15 días de préstamo estándar.
     /// </summary>
-    public override int GetDiasPrestamo() => 21;
+    public override int GetDiasPrestamo() => 15;
 
     public override string TipoDocumento => "Libro";
 

@@ -169,7 +169,7 @@ public class FormGestionDocumentos : Form
         {
             documento = new Libro
             {
-                Codigo = txtISBN.Text.Trim(),
+                Codigo = txtISBN.Text.Replace("-", "").Replace(" ", "").Trim(),
                 Titulo = txtTitulo.Text.Trim(),
                 Autor = txtAutor.Text.Trim(),
                 Editorial = txtEditorial.Text.Trim(),

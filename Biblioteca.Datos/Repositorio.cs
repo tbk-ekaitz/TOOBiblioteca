@@ -331,7 +331,7 @@ public static class Repositorio
             Id = GenerarIdPrestamo(),
             Usuario = _usuarios[1],
             Empleado = _empleados[1],
-            FechaPrestamo = DateTime.Now.AddDays(-5),
+            FechaPrestamo = DateTime.Now.AddDays(-50),
             Estado = EstadoPrestamo.Activo
         };
         var ejemplar2 = _ejemplares[2];

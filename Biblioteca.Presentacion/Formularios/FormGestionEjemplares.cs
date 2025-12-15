@@ -116,10 +116,9 @@ public class FormGestionEjemplares : Form
             e.CodigoBarras,
             e.Ubicacion,
             Estado = e.Estado.ToString(),
-            RegistradoPor = e.EmpleadoAlta.NombreCompleto,
             e.VecesPrestado,
             FechaAdquisicion = e.FechaAdquisicion.ToString("dd/MM/yyyy"),
-            AdquiridoPor = e.EmpleadoAlta.NombreCompleto
+            RegistradoPor = e.EmpleadoAlta.NombreCompleto
         }).ToList();
     }
 
