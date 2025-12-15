@@ -133,7 +133,8 @@ public class FormDisponibilidad : Form
             ej.CodigoBarras,
             Estado = ej.Estado.ToString(),
             ej.Ubicacion,
-            ej.VecesPrestado
+            ej.VecesPrestado,
+            //RegistradoPor = ej.EmpleadoAlta.NombreCompleto // naah, innecesario
         }).ToList();
 
         // Colorear según estado

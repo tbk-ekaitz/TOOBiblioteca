@@ -374,22 +374,29 @@ public static class Repositorio
         prestamo4.Ejemplares.Add(ejemplarVencido);
         ejemplarVencido.VecesPrestado++;
 
-        // Préstamo 5: Audiolibro activo
-        var prestamo5 = new Prestamo
-        {
-            Id = GenerarIdPrestamo(),
-            Usuario = _usuarios[4],
-            Empleado = _empleados[0],
-            FechaPrestamo = DateTime.Now.AddDays(-2),
-            Estado = EstadoPrestamo.Activo
-        };
-        var ejemplarAudio = _ejemplares.First(e => e.Documento.Codigo.StartsWith("AUD"));
-        ejemplarAudio.Estado = EstadoEjemplar.Prestado;
-        prestamo5.Ejemplares.Add(ejemplarAudio);
-        prestamo5.CalcularFechaDevolucion();
-        ejemplarAudio.VecesPrestado++;
+        var ejemplarAudio = _ejemplares.FirstOrDefault(e => e.Documento is Audiolibro);
 
-        _prestamos.AddRange(new[] { prestamo1, prestamo2, prestamo3, prestamo4, prestamo5 });
+        if (ejemplarAudio != null)
+        {
+            var prestamo5 = new Prestamo
+            {
+                Id = GenerarIdPrestamo(),
+                Usuario = _usuarios[4],
+                Empleado = _empleados[0],
+                FechaPrestamo = DateTime.Now.AddDays(-2),
+                Estado = EstadoPrestamo.Activo
+            };
+
+            ejemplarAudio.Estado = EstadoEjemplar.Prestado;
+            prestamo5.Ejemplares.Add(ejemplarAudio);
+            prestamo5.CalcularFechaDevolucion();
+            ejemplarAudio.VecesPrestado++;
+
+            _prestamos.Add(prestamo5);
+        }
+        
+
+        _prestamos.AddRange(new[] { prestamo1, prestamo2, prestamo3, prestamo4 });
     }
 
     private static string GenerarIdPrestamo()

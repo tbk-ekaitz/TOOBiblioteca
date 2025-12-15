@@ -175,7 +175,8 @@ public class FormGestionDocumentos : Form
                 Editorial = txtEditorial.Text.Trim(),
                 Genero = txtGenero.Text.Trim(),
                 AnioPublicacion = (int)nudAnio.Value,
-                NumeroPaginas = (int)nudPaginas.Value
+                NumeroPaginas = (int)nudPaginas.Value,
+                EmpleadoAlta = _empleado
             };
         }
         else
@@ -190,7 +191,8 @@ public class FormGestionDocumentos : Form
                 AnioPublicacion = (int)nudAnio.Value,
                 DuracionMinutos = (int)nudDuracion.Value,
                 Narrador = txtNarrador.Text.Trim(),
-                Formato = Enum.Parse<FormatoAudio>(cmbFormato.SelectedItem?.ToString() ?? "MP3")
+                Formato = Enum.Parse<FormatoAudio>(cmbFormato.SelectedItem?.ToString() ?? "MP3"),
+                EmpleadoAlta = _empleado
             };
         }
 
