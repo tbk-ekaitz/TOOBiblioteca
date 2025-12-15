@@ -512,5 +512,27 @@ public static class NegocioDocumentos
             .ToList();
     }
 
+    /// <summary>
+    /// Obtiene el resumen global para la barra de estado.
+    /// Tupla: (TotalDocs, TotalEjemplaresActivos, Prestados, NoPrestados)
+    /// </summary>
+    public static (int TotalDocs, int TotalEjemplares, int Prestados, int NoPrestados) ObtenerResumenInventario()
+    {
+        int totalDocs = Repositorio.ObtenerTodosDocumentos().Count;
+
+        // Obtenemos todos los ejemplares que NO sean Baja (Activos)
+        var ejemplaresActivos = Repositorio.ObtenerTodosEjemplares()
+            .Where(e => e.Estado != EstadoEjemplar.Baja)
+            .ToList();
+
+        int totalEjemplares = ejemplaresActivos.Count;
+        int prestados = ejemplaresActivos.Count(e => e.Estado == EstadoEjemplar.Prestado);
+
+        // "Sin prestar" son todos los activos menos los prestados (incluye Disponibles, EnReparacion, Reservados)
+        int noPrestados = totalEjemplares - prestados;
+
+        return (totalDocs, totalEjemplares, prestados, noPrestados);
+    }
+
     #endregion
 }

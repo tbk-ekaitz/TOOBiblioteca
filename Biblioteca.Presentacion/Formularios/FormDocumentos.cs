@@ -4,8 +4,9 @@ using Biblioteca.Negocio;
 namespace Biblioteca.Presentacion.Formularios;
 
 /// <summary>
-/// Formulario de catálogo con DataGridView y estadísticas.
-/// Implementa la Práctica 13 (visualización de datos en grid).
+/// Formulario unificado de Documentos.
+/// Tab 0: Catálogo (Búsqueda y listado).
+/// Tab 1: Estadísticas (Dashboard y análisis).
 /// </summary>
 public class FormDocumentos : Form
 {
@@ -13,7 +14,7 @@ public class FormDocumentos : Form
     private TabPage tabCatalogo;
     private TabPage tabEstadisticas;
 
-    // Tab Catálogo
+    // === CONTROLES TAB CATÁLOGO ===
     private DataGridView dgvDocumentos;
     private ComboBox cboTipo;
     private ComboBox cboGenero;
@@ -22,107 +23,77 @@ public class FormDocumentos : Form
     private Button btnLimpiar;
     private Label lblResultados;
 
-    // Tab Estadísticas
-    private GroupBox grpEstadisticas;
-    private ListBox lstTopPrestados;
-    private Label lblMasLeido;
-    private Label lblMasLeidoMes;
+    // === CONTROLES TAB ESTADÍSTICAS ===
+    // Sección 1: Totales
     private Label lblTotalLibros;
     private Label lblTotalAudiolibros;
-    private DataGridView dgvPorGenero;
+    private Label lblMasLeidoHistorico;
+
+    // Sección 2: Filtro Mensual (Lo que antes era el popup FormDocumentoMasLeido)
+    private GroupBox grpMes;
+    private ComboBox cmbMes;
+    private NumericUpDown nudAnio;
+    private Button btnConsultarMes;
+    private TextBox txtResultadoMes; // Para mostrar el título
+    private TextBox txtAutorMes;     // Para mostrar el autor
+
+    // Sección 3: Gráficos/Tablas
+    private DataGridView dgvTopPrestados; // Top 5
+    private DataGridView dgvPorGenero;    // Distribución
+
+    public int TabSeleccionado => tabControl.SelectedIndex;
 
     public FormDocumentos()
     {
         InitializeComponent();
-        CargarDatos();
-        CargarEstadisticas();
+        CargarDatosCatalogo();
+        CargarDatosEstadisticas();
     }
 
     private void InitializeComponent()
     {
-        Text = "Catálogo de Documentos";
-        Size = new Size(1000, 650);
+        Text = "Documentos"; // Renombrado como pediste
+        Size = new Size(1100, 700);
         StartPosition = FormStartPosition.CenterParent;
 
-        tabControl = new TabControl
-        {
-            Dock = DockStyle.Fill
-        };
+        tabControl = new TabControl { Dock = DockStyle.Fill };
 
-        // === TAB CATÁLOGO ===
+        // ==========================================
+        // TAB 1: CATÁLOGO (Manteniendo lo que ya tenías)
+        // ==========================================
         tabCatalogo = new TabPage("Catálogo");
-
-        // Filtros
-        var pnlFiltros = new Panel
-        {
-            Dock = DockStyle.Top,
-            Height = 50
-        };
-
-        var lblTipo = new Label { Text = "Tipo:", Location = new Point(10, 15), AutoSize = true };
-        cboTipo = new ComboBox
-        {
-            Location = new Point(45, 12),
-            Width = 120,
-            DropDownStyle = ComboBoxStyle.DropDownList
-        };
+        
+        var pnlFiltros = new Panel { Dock = DockStyle.Top, Height = 60, BackColor = Color.WhiteSmoke };
+        
+        var lblTipo = new Label { Text = "Tipo:", Location = new Point(15, 20), AutoSize = true };
+        cboTipo = new ComboBox { Location = new Point(55, 17), Width = 120, DropDownStyle = ComboBoxStyle.DropDownList };
         cboTipo.Items.AddRange(new object[] { "Todos", "Libros", "Audiolibros" });
         cboTipo.SelectedIndex = 0;
         cboTipo.SelectedIndexChanged += (s, e) => AplicarFiltros();
 
-        var lblGenero = new Label { Text = "Género:", Location = new Point(180, 15), AutoSize = true };
-        cboGenero = new ComboBox
-        {
-            Location = new Point(230, 12),
-            Width = 150,
-            DropDownStyle = ComboBoxStyle.DropDownList
-        };
+        var lblGenero = new Label { Text = "Género:", Location = new Point(190, 20), AutoSize = true };
+        cboGenero = new ComboBox { Location = new Point(245, 17), Width = 150, DropDownStyle = ComboBoxStyle.DropDownList };
         cboGenero.SelectedIndexChanged += (s, e) => AplicarFiltros();
 
-        txtBuscar = new TextBox
-        {
-            Location = new Point(400, 12),
-            Width = 200,
-            PlaceholderText = "Buscar por título o autor..."
-        };
-
-        btnBuscar = new Button
-        {
-            Text = "Buscar",
-            Location = new Point(610, 10),
-            Size = new Size(70, 25)
-        };
+        txtBuscar = new TextBox { Location = new Point(410, 17), Width = 250, PlaceholderText = "Título o Autor..." };
+        
+        btnBuscar = new Button { Text = "🔍 Buscar", Location = new Point(670, 15), Size = new Size(90, 27) };
         btnBuscar.Click += (s, e) => AplicarFiltros();
 
-        btnLimpiar = new Button
-        {
-            Text = "Limpiar",
-            Location = new Point(690, 10),
-            Size = new Size(70, 25)
-        };
+        btnLimpiar = new Button { Text = "Limpiar", Location = new Point(770, 15), Size = new Size(80, 27) };
         btnLimpiar.Click += BtnLimpiar_Click;
 
-        lblResultados = new Label
-        {
-            Location = new Point(780, 15),
-            AutoSize = true
-        };
+        lblResultados = new Label { Location = new Point(870, 20), AutoSize = true, Font = new Font(Font, FontStyle.Bold) };
 
-        pnlFiltros.Controls.AddRange(new Control[]
-        {
-            lblTipo, cboTipo, lblGenero, cboGenero, txtBuscar, btnBuscar, btnLimpiar, lblResultados
-        });
+        pnlFiltros.Controls.AddRange(new Control[] { lblTipo, cboTipo, lblGenero, cboGenero, txtBuscar, btnBuscar, btnLimpiar, lblResultados });
 
-        // DataGridView
         dgvDocumentos = new DataGridView
         {
             Dock = DockStyle.Fill,
             AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
             SelectionMode = DataGridViewSelectionMode.FullRowSelect,
-            MultiSelect = false,
             ReadOnly = true,
             AllowUserToAddRows = false,
-            AllowUserToDeleteRows = false,
             RowHeadersVisible = false
         };
         dgvDocumentos.CellFormatting += DgvDocumentos_CellFormatting;
@@ -130,155 +101,135 @@ public class FormDocumentos : Form
         tabCatalogo.Controls.Add(dgvDocumentos);
         tabCatalogo.Controls.Add(pnlFiltros);
 
-        // === TAB ESTADÍSTICAS ===
+        // ==========================================
+        // TAB 2: ESTADÍSTICAS (El nuevo Dashboard unificado)
+        // ==========================================
         tabEstadisticas = new TabPage("Estadísticas");
+        tabEstadisticas.Padding = new Padding(10);
 
-        var splitStats = new SplitContainer
+        // -- Panel Superior: Resumen --
+        var pnlResumen = new Panel { Dock = DockStyle.Top, Height = 80, BackColor = Color.AliceBlue };
+        pnlResumen.Padding = new Padding(10);
+
+        lblTotalLibros = new Label { Location = new Point(20, 15), AutoSize = true, Font = new Font("Segoe UI", 12, FontStyle.Bold) };
+        lblTotalAudiolibros = new Label { Location = new Point(20, 45), AutoSize = true, Font = new Font("Segoe UI", 12, FontStyle.Bold) };
+        lblMasLeidoHistorico = new Label { Location = new Point(300, 30), AutoSize = true, Font = new Font("Segoe UI", 14, FontStyle.Bold | FontStyle.Italic), ForeColor = Color.DarkBlue };
+
+        pnlResumen.Controls.AddRange(new Control[] { lblTotalLibros, lblTotalAudiolibros, lblMasLeidoHistorico });
+
+        // -- Panel Izquierdo: Filtro Mes y Top 5 --
+        var splitStats = new SplitContainer { Dock = DockStyle.Fill, Orientation = Orientation.Vertical, SplitterDistance = 450 };
+        splitStats.Panel1.Padding = new Padding(10);
+        splitStats.Panel2.Padding = new Padding(10);
+
+        // Grupo Filtro Mes (Absorbido de FormDocumentoMasLeido)
+        grpMes = new GroupBox { Text = "🔎 Más Leído por Mes", Dock = DockStyle.Top, Height = 180 };
+        
+        var lblMes = new Label { Text = "Mes:", Location = new Point(20, 30), AutoSize = true };
+        cmbMes = new ComboBox { Location = new Point(60, 27), Width = 120, DropDownStyle = ComboBoxStyle.DropDownList };
+        cmbMes.Items.AddRange(new[] { "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre" });
+        cmbMes.SelectedIndex = DateTime.Now.Month - 1;
+
+        var lblAnio = new Label { Text = "Año:", Location = new Point(200, 30), AutoSize = true };
+        nudAnio = new NumericUpDown { Location = new Point(240, 27), Width = 80, Minimum = 2000, Maximum = DateTime.Now.Year, Value = DateTime.Now.Year };
+
+        btnConsultarMes = new Button { Text = "Consultar", Location = new Point(340, 25), Size = new Size(80, 25) };
+        btnConsultarMes.Click += BtnConsultarMes_Click;
+
+        txtResultadoMes = new TextBox { Location = new Point(20, 70), Width = 400, ReadOnly = true, Font = new Font("Segoe UI", 10, FontStyle.Bold), TextAlign = HorizontalAlignment.Center };
+        txtAutorMes = new TextBox { Location = new Point(20, 105), Width = 400, ReadOnly = true, TextAlign = HorizontalAlignment.Center };
+        
+        grpMes.Controls.AddRange(new Control[] { lblMes, cmbMes, lblAnio, nudAnio, btnConsultarMes, txtResultadoMes, txtAutorMes });
+
+        // Grupo Top 5
+        var grpTop = new GroupBox { Text = "🏆 Top 5 Más Prestados", Dock = DockStyle.Fill }; // Fill el resto del panel izquierdo
+        dgvTopPrestados = new DataGridView
         {
             Dock = DockStyle.Fill,
-            Orientation = Orientation.Horizontal,
-            SplitterDistance = 200
+            AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+            ReadOnly = true,
+            AllowUserToAddRows = false,
+            RowHeadersVisible = false,
+            BackgroundColor = SystemColors.Control
         };
+        grpTop.Controls.Add(dgvTopPrestados);
 
-        // Panel superior - Resumen
-        var pnlResumen = new FlowLayoutPanel
-        {
-            Dock = DockStyle.Fill,
-            FlowDirection = FlowDirection.TopDown,
-            Padding = new Padding(20)
-        };
+        splitStats.Panel1.Controls.Add(grpTop);
+        splitStats.Panel1.Controls.Add(grpMes); // Orden: Mes arriba, Top abajo (por Dock)
+        grpTop.BringToFront(); // Asegurar que Top llene el espacio restante debajo de Mes
 
-        lblTotalLibros = new Label { AutoSize = true, Font = new Font("Segoe UI", 12) };
-        lblTotalAudiolibros = new Label { AutoSize = true, Font = new Font("Segoe UI", 12) };
-        lblMasLeido = new Label { AutoSize = true, Font = new Font("Segoe UI", 12) };
-        lblMasLeidoMes = new Label { AutoSize = true, Font = new Font("Segoe UI", 12) };
-
-        pnlResumen.Controls.AddRange(new Control[]
-        {
-            lblTotalLibros, lblTotalAudiolibros, lblMasLeido, lblMasLeidoMes
-        });
-
-        // Panel inferior - Top y por género
-        var splitInferior = new SplitContainer
-        {
-            Dock = DockStyle.Fill,
-            SplitterDistance = 400
-        };
-
-        // Top prestados
-        var grpTop = new GroupBox
-        {
-            Text = "Top 5 Más Prestados",
-            Dock = DockStyle.Fill,
-            Padding = new Padding(10)
-        };
-
-        lstTopPrestados = new ListBox
-        {
-            Dock = DockStyle.Fill
-        };
-        grpTop.Controls.Add(lstTopPrestados);
-
-        // Por género
-        var grpGenero = new GroupBox
-        {
-            Text = "Préstamos por Género",
-            Dock = DockStyle.Fill,
-            Padding = new Padding(10)
-        };
-
+        // -- Panel Derecho: Géneros --
+        var grpGeneros = new GroupBox { Text = "📊 Préstamos por Género", Dock = DockStyle.Fill };
         dgvPorGenero = new DataGridView
         {
             Dock = DockStyle.Fill,
             AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
             ReadOnly = true,
             AllowUserToAddRows = false,
-            RowHeadersVisible = false
+            RowHeadersVisible = false,
+            BackgroundColor = SystemColors.Control
         };
-        grpGenero.Controls.Add(dgvPorGenero);
-
-        splitInferior.Panel1.Controls.Add(grpTop);
-        splitInferior.Panel2.Controls.Add(grpGenero);
-
-        splitStats.Panel1.Controls.Add(pnlResumen);
-        splitStats.Panel2.Controls.Add(splitInferior);
+        grpGeneros.Controls.Add(dgvPorGenero);
+        splitStats.Panel2.Controls.Add(grpGeneros);
 
         tabEstadisticas.Controls.Add(splitStats);
+        tabEstadisticas.Controls.Add(pnlResumen);
 
-        // Añadir tabs
         tabControl.TabPages.Add(tabCatalogo);
         tabControl.TabPages.Add(tabEstadisticas);
         Controls.Add(tabControl);
     }
 
-    private void CargarDatos()
+    /// <summary>
+    /// Permite seleccionar qué pestaña mostrar al abrir el formulario.
+    /// </summary>
+    public void SeleccionarTab(int index)
     {
-        // Cargar géneros
+        if (index >= 0 && index < tabControl.TabCount)
+        {
+            tabControl.SelectedIndex = index;
+            if(index == 1) CargarDatosEstadisticas(); // Recargar al mostrar
+        }
+    }
+
+    // ==========================================
+    // LÓGICA TAB CATÁLOGO
+    // ==========================================
+    private void CargarDatosCatalogo()
+    {
         var generos = NegocioDocumentos.ObtenerGeneros();
         cboGenero.Items.Clear();
         cboGenero.Items.Add("Todos");
-        foreach (var g in generos)
-        {
-            cboGenero.Items.Add(g);
-        }
+        foreach (var g in generos) cboGenero.Items.Add(g);
         cboGenero.SelectedIndex = 0;
-
-        // Cargar documentos
         AplicarFiltros();
     }
 
     private void AplicarFiltros()
     {
         List<Documento> documentos;
-
-        // Filtrar por tipo
         string tipo = cboTipo.SelectedItem?.ToString() ?? "Todos";
-        if (tipo == "Libros")
-        {
-            documentos = NegocioDocumentos.ObtenerLibrosOrdenados().Cast<Documento>().ToList();
-        }
-        else if (tipo == "Audiolibros")
-        {
-            documentos = NegocioDocumentos.ObtenerAudiolibrosOrdenados().Cast<Documento>().ToList();
-        }
-        else
-        {
-            documentos = NegocioDocumentos.ObtenerTodosOrdenados();
-        }
+        
+        if (tipo == "Libros") documentos = NegocioDocumentos.ObtenerLibrosOrdenados().Cast<Documento>().ToList();
+        else if (tipo == "Audiolibros") documentos = NegocioDocumentos.ObtenerAudiolibrosOrdenados().Cast<Documento>().ToList();
+        else documentos = NegocioDocumentos.ObtenerTodosOrdenados();
 
-        // Filtrar por género
         string genero = cboGenero.SelectedItem?.ToString() ?? "Todos";
-        if (genero != "Todos")
-        {
-            documentos = documentos.Where(d => d.Genero == genero).ToList();
-        }
+        if (genero != "Todos") documentos = documentos.Where(d => d.Genero == genero).ToList();
 
-        // Filtrar por búsqueda
         if (!string.IsNullOrWhiteSpace(txtBuscar.Text))
         {
             string busqueda = txtBuscar.Text.ToLower();
-            documentos = documentos.Where(d =>
-                d.Titulo.ToLower().Contains(busqueda) ||
-                d.Autor.ToLower().Contains(busqueda))
-                .ToList();
+            documentos = documentos.Where(d => d.Titulo.ToLower().Contains(busqueda) || d.Autor.ToLower().Contains(busqueda)).ToList();
         }
 
-        // Mostrar en grid
-        dgvDocumentos.DataSource = documentos.Select(d => new
-        {
+        dgvDocumentos.DataSource = documentos.Select(d => new {
+            d.Codigo, d.Titulo, d.Autor, d.Genero, Año = d.AnioPublicacion,
             Tipo = d.TipoDocumento,
-            d.Codigo,
-            d.Titulo,
-            d.Autor,
-            d.Genero,
-            Año = d.AnioPublicacion,
-            Disponibles = NegocioDocumentos.ContarEjemplaresDisponibles(d.Codigo),
-            Detalles = d is Libro libro ? $"{libro.NumeroPaginas} págs." :
-                      d is Audiolibro audio ? audio.DuracionFormateada : "",
-            RegistradoPor = d.EmpleadoAlta?.NombreCompleto ?? "N/A"
+            Disponibles = NegocioDocumentos.ContarEjemplaresDisponibles(d.Codigo)
         }).ToList();
 
-        lblResultados.Text = $"{documentos.Count} documento(s)";
+        lblResultados.Text = $"{documentos.Count} resultados";
     }
 
     private void BtnLimpiar_Click(object? sender, EventArgs e)
@@ -291,49 +242,64 @@ public class FormDocumentos : Form
 
     private void DgvDocumentos_CellFormatting(object? sender, DataGridViewCellFormattingEventArgs e)
     {
-        if (dgvDocumentos.Columns[e.ColumnIndex].Name == "Disponibles")
+        if (dgvDocumentos.Columns[e.ColumnIndex].Name == "Disponibles" && e.Value is int disp)
         {
-            if (e.Value is int disponibles)
-            {
-                if (disponibles == 0)
-                {
-                    e.CellStyle.BackColor = Color.LightCoral;
-                }
-                else
-                {
-                    e.CellStyle.BackColor = Color.LightGreen;
-                }
-            }
+            e.CellStyle.BackColor = disp == 0 ? Color.LightCoral : Color.LightGreen;
         }
     }
 
-    private void CargarEstadisticas()
+    // ==========================================
+    // LÓGICA TAB ESTADÍSTICAS
+    // ==========================================
+    private void CargarDatosEstadisticas()
     {
+        // 1. Resumen Superior
         var (libros, audiolibros) = NegocioDocumentos.ContarPorTipo();
-        lblTotalLibros.Text = $"📚 Total de Libros: {libros}";
-        lblTotalAudiolibros.Text = $"🎧 Total de Audiolibros: {audiolibros}";
+        lblTotalLibros.Text = $"📚 Libros: {libros}";
+        lblTotalAudiolibros.Text = $"🎧 Audiolibros: {audiolibros}";
 
-        var masLeido = NegocioDocumentos.ObtenerMasLeido();
-        lblMasLeido.Text = $"⭐ Más leído (histórico): {masLeido?.Titulo ?? "N/A"}";
+        var masLeidoHist = NegocioDocumentos.ObtenerMasLeido();
+        lblMasLeidoHistorico.Text = masLeidoHist != null 
+            ? $"⭐ Estrella Histórica: {masLeidoHist.Titulo} ({masLeidoHist.Autor})" 
+            : "⭐ Estrella Histórica: -";
 
-        var masLeidoMes = NegocioDocumentos.ObtenerMasLeidoMes();
-        lblMasLeidoMes.Text = $"📅 Más leído (este mes): {masLeidoMes?.Titulo ?? "N/A"}";
+        // 2. Ejecutar consulta del mes actual por defecto
+        BtnConsultarMes_Click(null, null);
 
-        // Top prestados
-        lstTopPrestados.Items.Clear();
-        var topPrestados = NegocioDocumentos.ObtenerTopPrestados(5);
-        foreach (var (doc, veces) in topPrestados)
-        {
-            lstTopPrestados.Items.Add($"{doc.Titulo} - {veces} préstamo(s)");
-        }
+        // 3. Cargar Grids
+        // Top 5
+        var top5 = NegocioDocumentos.ObtenerTopPrestados(5);
+        dgvTopPrestados.DataSource = top5.Select(t => new { 
+            Título = t.Documento.Titulo, 
+            Autor = t.Documento.Autor, 
+            Préstamos = t.VecesPrestado 
+        }).ToList();
 
-        if (topPrestados.Count == 0)
-        {
-            lstTopPrestados.Items.Add("No hay datos de préstamos");
-        }
-
-        // Por género
+        // Por Género
         var porGenero = NegocioDocumentos.ObtenerEstadisticasPorGenero();
-        dgvPorGenero.DataSource = porGenero.Select(x => new { x.Genero, Préstamos = x.Cantidad }).ToList();
+        dgvPorGenero.DataSource = porGenero.Select(x => new { 
+            Género = x.Genero, 
+            Cantidad = x.Cantidad 
+        }).ToList();
+    }
+
+    private void BtnConsultarMes_Click(object? sender, EventArgs e)
+    {
+        int mes = cmbMes.SelectedIndex + 1;
+        int anio = (int)nudAnio.Value;
+
+        var doc = NegocioDocumentos.ObtenerMasLeidoMes(mes, anio);
+        if (doc != null)
+        {
+            txtResultadoMes.Text = doc.Titulo;
+            txtAutorMes.Text = doc.Autor;
+            txtResultadoMes.BackColor = Color.LightGreen;
+        }
+        else
+        {
+            txtResultadoMes.Text = "Sin datos en este periodo";
+            txtAutorMes.Text = "-";
+            txtResultadoMes.BackColor = Color.WhiteSmoke;
+        }
     }
 }

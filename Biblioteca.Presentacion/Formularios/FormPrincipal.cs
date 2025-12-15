@@ -1,5 +1,6 @@
 using Biblioteca.Dominio;
 using Biblioteca.Negocio;
+using Biblioteca.Presentacion.Formularios;
 
 namespace Biblioteca.Presentacion.Formularios;
 
@@ -16,6 +17,7 @@ public class FormPrincipal : Form
     private ToolStripStatusLabel lblUsuario;
     private ToolStripStatusLabel lblRol;
     private ToolStripStatusLabel lblFecha;
+    private ToolStripStatusLabel lblInfoInventario;
 
     private ToolStripMenuItem menuArchivo;
     private ToolStripMenuItem menuUsuarios;
@@ -29,6 +31,7 @@ public class FormPrincipal : Form
     private ToolStripButton tsbBuscarUsuario;
     private ToolStripButton tsbNuevoDocumento;
     private ToolStripButton tsbVerCatalogo;
+    private ToolStripButton tsbEstadisticas;
     private ToolStripButton tsbNuevoPrestamo;
     private ToolStripButton tsbDevolucion;
     private ToolStripButton tsbPrestamosVencidos;
@@ -44,16 +47,22 @@ public class FormPrincipal : Form
         ActualizarStatusBar();
     }
 
+    private ToolStripButton CrearBotonToolbar(string texto, EventHandler evento)
+    {
+        var btn = new ToolStripButton { Text = texto, DisplayStyle = ToolStripItemDisplayStyle.ImageAndText };
+        btn.Click += evento;
+        return btn;
+    }
+
     private void InitializeComponent()
     {
-        // Configuración MDI
         Text = "Sistema de Gestión de Biblioteca";
         Size = new Size(1200, 800);
         StartPosition = FormStartPosition.CenterScreen;
         IsMdiContainer = true;
         WindowState = FormWindowState.Maximized;
 
-        // Crear MenuStrip
+        // --- MENU STRIP ---
         menuPrincipal = new MenuStrip();
 
         // Menú Archivo
@@ -77,17 +86,15 @@ public class FormPrincipal : Form
         });
 
         // Menú Catálogo (PersonalAdquisiciones y Admin)
-        menuCatalogo = new ToolStripMenuItem("&Catálogo");
+        menuCatalogo = new ToolStripMenuItem("&Documentos");
         menuCatalogo.DropDownItems.AddRange(new ToolStripItem[]
         {
             new ToolStripMenuItem("&Ver Catálogo", null, VerCatalogo_Click),
+            new ToolStripMenuItem("&Estadísticas y Análisis", null, VerEstadisticas_Click),
+             new ToolStripSeparator(),
             new ToolStripMenuItem("&Alta Documento", null, AltaDocumento_Click),
             new ToolStripMenuItem("&Gestión Ejemplares", null, GestionEjemplares_Click),
-            new ToolStripSeparator(),
-            new ToolStripMenuItem("Documento &Más Leído", null, DocumentoMasLeido_Click),
             new ToolStripMenuItem("&Disponibilidad", null, ConsultaDisponibilidad_Click),
-            new ToolStripSeparator(),
-            new ToolStripMenuItem("&Estadísticas", null, Estadisticas_Click)
         });
 
         // Menú Préstamos (PersonalSala y Admin)
@@ -129,107 +136,58 @@ public class FormPrincipal : Form
         });
         menuPrincipal.MdiWindowListItem = menuVentana;
 
-        // ToolStrip
-        toolStripPrincipal = new ToolStrip();
-        toolStripPrincipal.ImageScalingSize = new Size(24, 24);
+        // --- TOOL STRIP ---
+        toolStripPrincipal = new ToolStrip { ImageScalingSize = new Size(24, 24) };
 
-        tsbNuevoUsuario = new ToolStripButton
-        {
-            Text = "Nuevo Usuario",
-            DisplayStyle = ToolStripItemDisplayStyle.ImageAndText,
-            ToolTipText = "Alta de nuevo usuario (Ctrl+N)"
-        };
-        tsbNuevoUsuario.Click += AltaUsuario_Click;
+        tsbNuevoUsuario = CrearBotonToolbar("Nuevo Usuario", AltaUsuario_Click);
+        tsbBuscarUsuario = CrearBotonToolbar("Buscar Usuario", BuscarUsuario_Click);
+        tsbNuevoDocumento = CrearBotonToolbar("Nuevo Documento", AltaDocumento_Click);
 
-        tsbBuscarUsuario = new ToolStripButton
-        {
-            Text = "Buscar Usuario",
-            DisplayStyle = ToolStripItemDisplayStyle.ImageAndText,
-            ToolTipText = "Buscar usuario por DNI (Ctrl+B)"
-        };
-        tsbBuscarUsuario.Click += BuscarUsuario_Click;
+        // Botones separados para Catálogo y Estadísticas
+        tsbVerCatalogo = CrearBotonToolbar("Catálogo", VerCatalogo_Click);
+        tsbEstadisticas = CrearBotonToolbar("Estadísticas", VerEstadisticas_Click); // NUEVO
 
-        tsbNuevoDocumento = new ToolStripButton
-        {
-            Text = "Nuevo Documento",
-            DisplayStyle = ToolStripItemDisplayStyle.ImageAndText,
-            ToolTipText = "Alta de nuevo documento"
-        };
-        tsbNuevoDocumento.Click += AltaDocumento_Click;
+        tsbNuevoPrestamo = CrearBotonToolbar("Nuevo Préstamo", NuevoPrestamo_Click);
+        tsbDevolucion = CrearBotonToolbar("Devolución", RegistrarDevolucion_Click);
+        tsbCerrarSesion = CrearBotonToolbar("Salir", CerrarSesion_Click);
+        tsbCerrarSesion.Alignment = ToolStripItemAlignment.Right;
 
-        tsbVerCatalogo = new ToolStripButton
-        {
-            Text = "Catálogo",
-            DisplayStyle = ToolStripItemDisplayStyle.ImageAndText,
-            ToolTipText = "Ver catálogo de documentos"
-        };
-        tsbVerCatalogo.Click += VerCatalogo_Click;
-
-        tsbNuevoPrestamo = new ToolStripButton
-        {
-            Text = "Nuevo Préstamo",
-            DisplayStyle = ToolStripItemDisplayStyle.ImageAndText,
-            ToolTipText = "Registrar nuevo préstamo (Ctrl+P)"
-        };
-        tsbNuevoPrestamo.Click += NuevoPrestamo_Click;
-
-        tsbDevolucion = new ToolStripButton
-        {
-            Text = "Devolución",
-            DisplayStyle = ToolStripItemDisplayStyle.ImageAndText,
-            ToolTipText = "Registrar devolución (Ctrl+D)"
-        };
-        tsbDevolucion.Click += RegistrarDevolucion_Click;
-
-        tsbPrestamosVencidos = new ToolStripButton
-        {
-            Text = "Vencidos",
-            DisplayStyle = ToolStripItemDisplayStyle.ImageAndText,
-            ToolTipText = "Ver préstamos vencidos"
-        };
-        tsbPrestamosVencidos.Click += PrestamosVencidos_Click;
-
-        tsbCerrarSesion = new ToolStripButton
-        {
-            Text = "Cerrar Sesión",
-            DisplayStyle = ToolStripItemDisplayStyle.ImageAndText,
-            ToolTipText = "Cerrar sesión actual",
-            Alignment = ToolStripItemAlignment.Right
-        };
-        tsbCerrarSesion.Click += CerrarSesion_Click;
-
-        toolStripPrincipal.Items.AddRange(new ToolStripItem[]
-        {
-            tsbNuevoUsuario,
-            tsbBuscarUsuario,
-            new ToolStripSeparator(),
-            tsbNuevoDocumento,
-            tsbVerCatalogo,
-            new ToolStripSeparator(),
-            tsbNuevoPrestamo,
-            tsbDevolucion,
-            tsbPrestamosVencidos,
-            new ToolStripSeparator(),
+        toolStripPrincipal.Items.AddRange(new ToolStripItem[] {
+            tsbNuevoUsuario, tsbBuscarUsuario, new ToolStripSeparator(),
+            tsbNuevoDocumento, tsbVerCatalogo, tsbEstadisticas, new ToolStripSeparator(),
+            tsbNuevoPrestamo, tsbDevolucion, new ToolStripSeparator(),
             tsbCerrarSesion
         });
 
-        // StatusStrip
+
+
+        // --- STATUS STRIP (Barra de Estado) ---
         statusBar = new StatusStrip();
         lblUsuario = new ToolStripStatusLabel { BorderSides = ToolStripStatusLabelBorderSides.Right };
         lblRol = new ToolStripStatusLabel { BorderSides = ToolStripStatusLabelBorderSides.Right };
         lblFecha = new ToolStripStatusLabel { Spring = true, TextAlign = ContentAlignment.MiddleRight };
 
-        statusBar.Items.AddRange(new ToolStripItem[] { lblUsuario, lblRol, lblFecha });
+        // Etiqueta nueva para los contadores
+        lblInfoInventario = new ToolStripStatusLabel
+        {
+            BorderSides = ToolStripStatusLabelBorderSides.Right,
+            ForeColor = Color.DarkBlue,
+            Font = new Font("Segoe UI", 9, FontStyle.Bold)
+        };
 
-        // Añadir controles al formulario
-        MainMenuStrip = menuPrincipal;
+
+        statusBar.Items.AddRange(new ToolStripItem[] { lblUsuario, lblRol, lblInfoInventario, lblFecha });
+        Controls.Add(statusBar);
         Controls.Add(toolStripPrincipal);
         Controls.Add(menuPrincipal);
-        Controls.Add(statusBar);
 
         // Timer para actualizar fecha/hora
         var timer = new System.Windows.Forms.Timer { Interval = 1000 };
-        timer.Tick += (s, e) => lblFecha.Text = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+        timer.Tick += (s, e) =>
+        {
+            lblFecha.Text = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+            ActualizarContadoresInventario();
+        };
         timer.Start();
     }
 
@@ -269,6 +227,16 @@ public class FormPrincipal : Form
         lblUsuario.Text = $"Usuario: {_empleadoActual.NombreCompleto}";
         lblRol.Text = $"Rol: {_empleadoActual.Rol}";
         lblFecha.Text = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+        ActualizarContadoresInventario();
+    }
+
+    private void ActualizarContadoresInventario()
+    {
+        // Obtenemos los datos frescos de Negocio
+        var stats = NegocioDocumentos.ObtenerResumenInventario();
+
+        // Formato solicitado: "Total de Documentos: X; Ejemplares: [(total), (prestados), (sin prestar)]"
+        lblInfoInventario.Text = $"Documentos: {stats.TotalDocs} | Ejemplares: [(Total: {stats.TotalEjemplares}), (Prestados: {stats.Prestados}), (Sin prestar: {stats.NoPrestados})]";
     }
 
     #region Manejadores de Eventos del Menú
@@ -278,110 +246,51 @@ public class FormPrincipal : Form
         if (MessageBox.Show("¿Desea cerrar la sesión actual?", "Cerrar Sesión",
             MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
         {
-            // Cerrar todos los formularios hijos
-            foreach (Form child in MdiChildren)
-            {
-                child.Close();
-            }
-
-            // Mostrar nuevo login
+            foreach (Form child in MdiChildren) child.Close();
             Hide();
             using (var formLogin = new FormLogin())
             {
-                if (formLogin.ShowDialog() == DialogResult.OK && formLogin.EmpleadoLogueado != null)
-                {
-                    Application.Restart();
-                }
-                else
-                {
-                    Application.Exit();
-                }
+                if (formLogin.ShowDialog() == DialogResult.OK && formLogin.EmpleadoLogueado != null) Application.Restart();
+                else Application.Exit();
             }
         }
     }
+
+    //private void Salir_Click(object? sender, EventArgs e) => Application.Exit();
 
     private void Salir_Click(object? sender, EventArgs e)
     {
         if (MessageBox.Show("¿Desea salir de la aplicación?", "Salir",
-            MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-        {
-            Application.Exit();
-        }
+            MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) Application.Exit();
     }
 
-    private void BuscarUsuario_Click(object? sender, EventArgs e)
-    {
-        AbrirFormularioHijo<FormSolicitarDNI>(FormSolicitarDNI.Modo.Buscar);
-    }
+    private void BuscarUsuario_Click(object? sender, EventArgs e) => AbrirFormularioHijo<FormSolicitarDNI>(FormSolicitarDNI.Modo.Buscar);
 
-    private void AltaUsuario_Click(object? sender, EventArgs e)
-    {
-        AbrirFormularioHijo<FormSolicitarDNI>(FormSolicitarDNI.Modo.Alta);
-    }
+    private void AltaUsuario_Click(object? sender, EventArgs e) => AbrirFormularioHijo<FormSolicitarDNI>(FormSolicitarDNI.Modo.Alta);
 
-    private void BajaUsuario_Click(object? sender, EventArgs e)
-    {
-        AbrirFormularioHijo<FormBajaUsuario>();
-    }
+    private void BajaUsuario_Click(object? sender, EventArgs e) => AbrirFormularioHijo<FormBajaUsuario>();
 
-    private void ListadoUsuarios_Click(object? sender, EventArgs e)
-    {
-        AbrirFormularioHijo<FormListados>();
-    }
+    private void ListadoUsuarios_Click(object? sender, EventArgs e) => AbrirFormularioHijo<FormListados>();
 
-    private void VerCatalogo_Click(object? sender, EventArgs e)
-    {
-        AbrirFormularioHijo<FormDocumentos>();
-    }
+    private void VerCatalogo_Click(object? sender, EventArgs e) => AbrirOCrearDocumentos(0);
 
-    private void AltaDocumento_Click(object? sender, EventArgs e)
-    {
-        var form = new FormGestionDocumentos(FormGestionDocumentos.Modo.Alta, _empleadoActual);
-        form.MdiParent = this;
-        form.Show();
-    }
+    private void VerEstadisticas_Click(object? sender, EventArgs e) => AbrirOCrearDocumentos(1);
 
-    private void GestionEjemplares_Click(object? sender, EventArgs e)
-    {
-        var form = new FormGestionEjemplares(_empleadoActual);
-        form.MdiParent = this;
-        form.Show();
-    }
+    private void AltaDocumento_Click(object? sender, EventArgs e) => new FormGestionDocumentos(FormGestionDocumentos.Modo.Alta, _empleadoActual) { MdiParent = this }.Show();
 
-    private void DocumentoMasLeido_Click(object? sender, EventArgs e)
-    {
-        AbrirFormularioHijo<FormDocumentoMasLeido>();
-    }
+    private void GestionEjemplares_Click(object? sender, EventArgs e) => new FormGestionEjemplares(_empleadoActual) { MdiParent = this }.Show();
 
-    private void ConsultaDisponibilidad_Click(object? sender, EventArgs e)
-    {
-        AbrirFormularioHijo<FormDisponibilidad>();
-    }
+    private void DocumentoMasLeido_Click(object? sender, EventArgs e) => AbrirFormularioHijo<FormDocumentoMasLeido>();
 
-    private void Estadisticas_Click(object? sender, EventArgs e)
-    {
-        MostrarEstadisticas();
-    }
+    private void ConsultaDisponibilidad_Click(object? sender, EventArgs e) => AbrirFormularioHijo<FormDisponibilidad>();
 
-    private void NuevoPrestamo_Click(object? sender, EventArgs e)
-    {
-        AbrirFormularioHijo<FormAltaPrestamo>();
-    }
+    private void NuevoPrestamo_Click(object? sender, EventArgs e) => AbrirFormularioHijo<FormAltaPrestamo>();
 
-    private void RegistrarDevolucion_Click(object? sender, EventArgs e)
-    {
-        AbrirFormularioHijo<FormDevolucion>();
-    }
+    private void RegistrarDevolucion_Click(object? sender, EventArgs e) => AbrirFormularioHijo<FormDevolucion>();
 
-    private void ConsultarPrestamo_Click(object? sender, EventArgs e)
-    {
-        AbrirFormularioHijo<FormConsultaPrestamo>();
-    }
+    private void ConsultarPrestamo_Click(object? sender, EventArgs e) => AbrirFormularioHijo<FormConsultaPrestamo>();
 
-    private void ListadoPrestamos_Click(object? sender, EventArgs e)
-    {
-        AbrirFormularioHijo<FormListadoPrestamos>();
-    }
+    private void ListadoPrestamos_Click(object? sender, EventArgs e) => AbrirFormularioHijo<FormListadoPrestamos>();
 
     private void PrestamosActivos_Click(object? sender, EventArgs e)
     {
@@ -390,17 +299,11 @@ public class FormPrincipal : Form
             "Préstamos Activos", MessageBoxButtons.OK, MessageBoxIcon.Information);
     }
 
-    private void PrestamosVencidos_Click(object? sender, EventArgs e)
-    {
-        AbrirFormularioHijo<FormPrestamosFueraPlazo>();
-    }
+    private void PrestamosVencidos_Click(object? sender, EventArgs e) => AbrirFormularioHijo<FormPrestamosFueraPlazo>();
 
     private void CerrarTodas_Click(object? sender, EventArgs e)
     {
-        foreach (Form child in MdiChildren)
-        {
-            child.Close();
-        }
+        foreach (Form child in MdiChildren) child.Close();
     }
 
     private void AcercaDe_Click(object? sender, EventArgs e)
@@ -408,8 +311,6 @@ public class FormPrincipal : Form
         MessageBox.Show(
             "Sistema de Gestión de Biblioteca\n" +
             "Versión 1.0\n\n" +
-            "Desarrollado para prácticas de Windows Forms\n" +
-            "Arquitectura N-Capas con LINQ\n\n" +
             $"Usuario actual: {_empleadoActual.NombreCompleto}\n" +
             $"Rol: {_empleadoActual.Rol}",
             "Acerca de",
@@ -452,26 +353,45 @@ public class FormPrincipal : Form
         form.Show();
     }
 
-    private void MostrarEstadisticas()
+    //var form = AbrirFormularioUnico<FormDocumentos>();
+    //form.SeleccionarTab(0);
+    //private T AbrirFormularioUnico<T>() where T : Form, new()
+    //{
+    //    foreach (Form child in MdiChildren)
+    //    {
+    //        if (child is T f)
+    //        {
+    //            f.Activate();
+    //            return f;
+    //        }
+    //    }
+    //    var form = new T();
+    //    form.MdiParent = this;
+    //    form.Show();
+    //    return form;
+    //}
+
+    private void AbrirOCrearDocumentos(int indiceTab)
     {
-        var (libros, audiolibros) = NegocioDocumentos.ContarPorTipo();
-        var masLeido = NegocioDocumentos.ObtenerMasLeido();
-        var stats = NegocioPrestamos.ObtenerEstadisticas();
+        // Buscamos si ya existe algún FormDocumentos abierto QUE ESTÉ EN ESE TAB
+        var formularioExistente = MdiChildren.OfType<FormDocumentos>()
+                                             .FirstOrDefault(f => f.TabSeleccionado == indiceTab);
 
-        var mensaje =
-            $"=== ESTADÍSTICAS DEL CATÁLOGO ===\n\n" +
-            $"Libros: {libros}\n" +
-            $"Audiolibros: {audiolibros}\n" +
-            $"Total documentos: {libros + audiolibros}\n\n" +
-            $"Documento más leído: {masLeido?.Titulo ?? "N/A"}\n\n" +
-            $"=== ESTADÍSTICAS DE PRÉSTAMOS ===\n\n" +
-            $"Total préstamos: {stats.Total}\n" +
-            $"Activos: {stats.Activos}\n" +
-            $"Vencidos: {stats.Vencidos}\n" +
-            $"Devueltos este mes: {stats.DevueltosEsteMes}";
-
-        MessageBox.Show(mensaje, "Estadísticas", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        if (formularioExistente != null)
+        {
+            // Si ya hay uno mirando lo que queremos, lo traemos al frente
+            formularioExistente.Activate();
+        }
+        else
+        {
+            // Si no hay ninguno (o los que hay están en el otro tab), creamos uno nuevo
+            var nuevoForm = new FormDocumentos();
+            nuevoForm.MdiParent = this;
+            nuevoForm.Show();
+            nuevoForm.SeleccionarTab(indiceTab);
+        }
     }
+
 
     #endregion
 
