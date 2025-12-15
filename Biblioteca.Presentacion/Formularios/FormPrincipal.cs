@@ -37,6 +37,10 @@ public class FormPrincipal : Form
     private ToolStripButton tsbPrestamosVencidos;
     private ToolStripButton tsbCerrarSesion;
 
+    private ToolStripMenuItem itemEstadisticas;
+    private ToolStripMenuItem itemAltaDocumento;
+    private ToolStripMenuItem itemGestionEjemplares;
+
     private readonly Empleado _empleadoActual;
 
     public FormPrincipal(Empleado empleado)
@@ -87,13 +91,16 @@ public class FormPrincipal : Form
 
         // Menú Catálogo (PersonalAdquisiciones y Admin)
         menuCatalogo = new ToolStripMenuItem("&Documentos");
+        itemEstadisticas = new ToolStripMenuItem("&Estadísticas y Análisis", null, VerEstadisticas_Click);
+        itemAltaDocumento = new ToolStripMenuItem("&Alta Documento", null, AltaDocumento_Click);
+        itemGestionEjemplares = new ToolStripMenuItem("&Gestión Ejemplares", null, GestionEjemplares_Click);
         menuCatalogo.DropDownItems.AddRange(new ToolStripItem[]
         {
             new ToolStripMenuItem("&Ver Catálogo", null, VerCatalogo_Click),
-            new ToolStripMenuItem("&Estadísticas y Análisis", null, VerEstadisticas_Click),
-             new ToolStripSeparator(),
-            new ToolStripMenuItem("&Alta Documento", null, AltaDocumento_Click),
-            new ToolStripMenuItem("&Gestión Ejemplares", null, GestionEjemplares_Click),
+            itemEstadisticas,
+            new ToolStripSeparator(),
+            itemAltaDocumento,
+            itemGestionEjemplares,
             new ToolStripMenuItem("&Disponibilidad", null, ConsultaDisponibilidad_Click),
         });
 
@@ -208,7 +215,11 @@ public class FormPrincipal : Form
 
             case Role.PersonalSala:
                 // Personal de sala: usuarios y préstamos, NO catálogo
-                menuCatalogo.Visible = false;
+                //menuCatalogo.Visible = false;
+                itemEstadisticas.Visible = false;
+                itemAltaDocumento.Visible = false;
+                itemGestionEjemplares.Visible = false;
+
                 tsbNuevoDocumento.Visible = false;
                 tsbVerCatalogo.Visible = false;
                 tsbEstadisticas.Visible = false;
@@ -217,6 +228,7 @@ public class FormPrincipal : Form
             case Role.PersonalAdquisiciones:
                 // Personal de adquisiciones: usuarios y catálogo, NO préstamos
                 menuPrestamos.Visible = false;
+
                 tsbNuevoPrestamo.Visible = false;
                 tsbDevolucion.Visible = false;
                 tsbPrestamosVencidos.Visible = false;
