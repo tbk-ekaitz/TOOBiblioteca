@@ -107,7 +107,7 @@ public class FormPrincipal : Form
             new ToolStripMenuItem("&Consultar Préstamo", null, ConsultarPrestamo_Click),
             new ToolStripMenuItem("&Listado Préstamos", null, ListadoPrestamos_Click),
             new ToolStripSeparator(),
-            new ToolStripMenuItem("Préstamos &Activos", null, PrestamosActivos_Click),
+            //new ToolStripMenuItem("Préstamos &Activos", null, PrestamosActivos_Click),
             new ToolStripMenuItem("Préstamos &Vencidos", null, PrestamosVencidos_Click)
         });
 
@@ -282,7 +282,7 @@ public class FormPrincipal : Form
 
     private void GestionEjemplares_Click(object? sender, EventArgs e) => new FormGestionEjemplares(_empleadoActual) { MdiParent = this }.Show();
 
-    private void DocumentoMasLeido_Click(object? sender, EventArgs e) => AbrirFormularioHijo<FormDocumentoMasLeido>();
+    //private void DocumentoMasLeido_Click(object? sender, EventArgs e) => AbrirFormularioHijo<FormDocumentoMasLeido>();
 
     private void ConsultaDisponibilidad_Click(object? sender, EventArgs e) => AbrirFormularioHijo<FormDisponibilidad>();
 
@@ -294,12 +294,12 @@ public class FormPrincipal : Form
 
     private void ListadoPrestamos_Click(object? sender, EventArgs e) => AbrirFormularioHijo<FormListadoPrestamos>();
 
-    private void PrestamosActivos_Click(object? sender, EventArgs e)
-    {
-        var prestamos = NegocioPrestamos.ObtenerActivosOrdenados();
-        MessageBox.Show($"Préstamos activos: {prestamos.Count}",
-            "Préstamos Activos", MessageBoxButtons.OK, MessageBoxIcon.Information);
-    }
+    //private void PrestamosActivos_Click(object? sender, EventArgs e)
+    //{
+    //    var prestamos = NegocioPrestamos.ObtenerActivosOrdenados();
+    //    MessageBox.Show($"Préstamos activos: {prestamos.Count}",
+    //        "Préstamos Activos", MessageBoxButtons.OK, MessageBoxIcon.Information);
+    //}
 
     private void PrestamosVencidos_Click(object? sender, EventArgs e) => AbrirFormularioHijo<FormPrestamosFueraPlazo>();
 
@@ -387,7 +387,7 @@ public class FormPrincipal : Form
         else
         {
             // Si no hay ninguno (o los que hay están en el otro tab), creamos uno nuevo
-            var nuevoForm = new FormDocumentos();
+            var nuevoForm = new FormDocumentos(_empleadoActual);
             nuevoForm.MdiParent = this;
             nuevoForm.Show();
             nuevoForm.SeleccionarTab(indiceTab);

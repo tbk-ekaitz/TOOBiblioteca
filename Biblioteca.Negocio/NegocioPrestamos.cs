@@ -255,7 +255,7 @@ public static class NegocioPrestamos
         if (prestamo == null)
             return (false, "Préstamo no encontrado.");
 
-        if (prestamo.Estado != EstadoPrestamo.Activo && prestamo.Estado != EstadoPrestamo.Vencido)
+        if (prestamo.Estado != EstadoPrestamo.Activo)
             return (false, $"El préstamo no está activo. Estado actual: {prestamo.Estado}.");
 
         // Actualizar ejemplares

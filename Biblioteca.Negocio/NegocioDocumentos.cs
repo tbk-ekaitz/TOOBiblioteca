@@ -39,7 +39,7 @@ public static class NegocioDocumentos
     public static List<Audiolibro> ObtenerAudiolibrosOrdenados()
     {
         return Repositorio.ObtenerTodosAudiolibros()
-            .OrderByDescending(a => a.DuracionMinutos)
+            .OrderByDescending(a => a.DuracionSegundos)
             .ToList();
     }
 

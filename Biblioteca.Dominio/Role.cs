@@ -6,18 +6,10 @@ namespace Biblioteca.Dominio;
 /// </summary>
 public enum Role
 {
-    /// <summary>
-    /// Personal de sala: gestiona préstamos y usuarios.
-    /// </summary>
+    // Gestiona préstamos y usuarios.
     PersonalSala,
-
-    /// <summary>
-    /// Personal de adquisiciones: gestiona el catálogo de documentos.
-    /// </summary>
+    // Gestiona el catálogo de documentos.
     PersonalAdquisiciones,
-
-    /// <summary>
-    /// Administrador: acceso completo al sistema.
-    /// </summary>
+    // Todo
     Administrador
 }

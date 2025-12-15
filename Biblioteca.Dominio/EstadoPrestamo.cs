@@ -2,27 +2,15 @@ namespace Biblioteca.Dominio;
 
 /// <summary>
 /// Estados posibles de un préstamo.
-/// Si, cambie los nombres, me liaba entre Finalizado y Cancelado. Y no me gusta tener que estar haciendo cAmElCaSe...
+/// Si, cambie los nombres, no, no es AI slop, es que me liaba entre Finalizado y Cancelado. 
+/// Y no me gusta tener que estar haciendo cAmElCaSe, ya que estaba lo cambiaba por activo
+/// No esque me la veo venir la de "ui, porque los llamaste asi?? donde lo copiaste/chatgpt, 
+/// asique mejor me pre-explico
 /// </summary>
 public enum EstadoPrestamo
 {
-    /// <summary>
-    /// Préstamo activo, pendiente de devolución.
-    /// </summary>
     Activo,
-
-    /// <summary>
-    /// Préstamo devuelto correctamente.
-    /// </summary>
     Devuelto,
-
-    /// <summary>
-    /// Préstamo con fecha de devolución vencida.
-    /// </summary>
-    Vencido,
-
-    /// <summary>
-    /// Préstamo cancelado por algún motivo.
-    /// </summary>
+    // No estado Vencido
     Cancelado
 }

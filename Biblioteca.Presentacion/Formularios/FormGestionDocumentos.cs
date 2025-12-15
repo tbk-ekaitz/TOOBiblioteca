@@ -36,6 +36,8 @@ public class FormGestionDocumentos : Form
     private Button btnCancelar;
     private ErrorProvider errorProvider;
 
+    private Documento? _documentoActual;
+
     public FormGestionDocumentos(Modo modo, Empleado empleado)
     {
         _modo = modo;
@@ -104,8 +106,8 @@ public class FormGestionDocumentos : Form
 
         // Grupo Audiolibro
         grpAudiolibro = new GroupBox { Text = "Datos del Audiolibro", Location = new Point(20, y), Size = new Size(440, 90), Visible = false };
-        grpAudiolibro.Controls.Add(new Label { Text = "Duración (min):", Location = new Point(15, 25), AutoSize = true });
-        nudDuracion = new NumericUpDown { Location = new Point(120, 22), Width = 80, Minimum = 1, Maximum = 100000, Value = 60 };
+        grpAudiolibro.Controls.Add(new Label { Text = "Duración (seg):", Location = new Point(15, 25), AutoSize = true });
+        nudDuracion = new NumericUpDown { Location = new Point(120, 22), Width = 80, Minimum = 1, Maximum = 1000000, Value = 5400 };
         grpAudiolibro.Controls.Add(nudDuracion);
         grpAudiolibro.Controls.Add(new Label { Text = "Narrador:", Location = new Point(15, 55), AutoSize = true });
         txtNarrador = new TextBox { Location = new Point(120, 52), Width = 150 };
@@ -128,6 +130,63 @@ public class FormGestionDocumentos : Form
         Controls.AddRange(new Control[] { lblTipo, cmbTipo, lblISBN, txtISBN, lblTitulo, txtTitulo,
             lblAutor, txtAutor, lblEditorial, txtEditorial, lblGenero, txtGenero, lblAnio, nudAnio,
             grpLibro, grpAudiolibro, btnGuardar, btnCancelar });
+    }
+
+    public FormGestionDocumentos(Documento documento, Empleado empleado) : this(Modo.Modificar, empleado)
+    {
+        _documentoActual = documento;
+
+        // Cambiamos el título de la ventana
+        Text = $"Detalles: {documento.Titulo}";
+
+        // Cargamos los datos en los controles
+        CargarDatos();
+    }
+
+    private void CargarDatos()
+    {
+        if (_documentoActual == null) return;
+
+        // 1. Cargar Datos Comunes
+        txtISBN.Text = _documentoActual.Codigo;
+        txtISBN.ReadOnly = true; // El ID no se debe tocar al editar
+
+        txtTitulo.Text = _documentoActual.Titulo;
+        txtAutor.Text = _documentoActual.Autor;
+        txtEditorial.Text = _documentoActual.Editorial;
+        txtGenero.Text = _documentoActual.Genero;
+        nudAnio.Value = _documentoActual.AnioPublicacion;
+
+        // 2. Lógica Diferenciada (Libro vs Audiolibro)
+        if (_documentoActual is Libro libro)
+        {
+            // Configuramos modo Libro
+            cmbTipo.SelectedItem = "Libro";
+            cmbTipo.Enabled = false; // No puedes convertir un libro en audio
+
+            // Cargar datos específicos
+            nudPaginas.Value = libro.NumeroPaginas;
+
+            // Mostrar/Ocultar paneles
+            grpLibro.Visible = true;
+            grpAudiolibro.Visible = false;
+        }
+        else if (_documentoActual is Audiolibro audio)
+        {
+            // Configuramos modo Audiolibro
+            cmbTipo.SelectedItem = "Audiolibro";
+            cmbTipo.Enabled = false;
+
+            // Cargar datos específicos
+            nudDuracion.Value = audio.DuracionSegundos;
+            txtNarrador.Text = audio.Narrador;
+            if (Enum.IsDefined(typeof(FormatoAudio), audio.Formato))
+                cmbFormato.SelectedItem = audio.Formato.ToString();
+
+            // Mostrar/Ocultar paneles
+            grpLibro.Visible = false;
+            grpAudiolibro.Visible = true;
+        }
     }
 
     private void CmbTipo_SelectedIndexChanged(object? sender, EventArgs e)
@@ -164,12 +223,22 @@ public class FormGestionDocumentos : Form
             return;
         }
 
+        //string codigoFormat;
+        //if (_modo == Modo.Alta)
+        //{
+        //    codigoFormat = txtISBN.Text.Replace("-", "").Replace(" ", "").Trim();
+        //}
+        //else
+        //{
+        //    codigoFormat = txtISBN.Text.Trim();
+        //}
+
         Documento documento;
         if (cmbTipo.SelectedIndex == 0)
         {
             documento = new Libro
             {
-                Codigo = txtISBN.Text.Replace("-", "").Replace(" ", "").Trim(),
+                Codigo = txtISBN.Text,
                 Titulo = txtTitulo.Text.Trim(),
                 Autor = txtAutor.Text.Trim(),
                 Editorial = txtEditorial.Text.Trim(),
@@ -183,13 +252,13 @@ public class FormGestionDocumentos : Form
         {
             documento = new Audiolibro
             {
-                Codigo = txtISBN.Text.Trim(),
+                Codigo = txtISBN.Text,
                 Titulo = txtTitulo.Text.Trim(),
                 Autor = txtAutor.Text.Trim(),
                 Editorial = txtEditorial.Text.Trim(),
                 Genero = txtGenero.Text.Trim(),
                 AnioPublicacion = (int)nudAnio.Value,
-                DuracionMinutos = (int)nudDuracion.Value,
+                DuracionSegundos = (int)nudDuracion.Value,
                 Narrador = txtNarrador.Text.Trim(),
                 Formato = Enum.Parse<FormatoAudio>(cmbFormato.SelectedItem?.ToString() ?? "MP3"),
                 EmpleadoAlta = _empleado

@@ -21,7 +21,9 @@ public static class Repositorio
 
     #endregion
 
-    #region Constructor Estático - Carga de Datos de Prueba
+    #region Carga de Datos de Prueba 
+    // (OBVIAMENTE rellene los datos con ayuda de LLM, prefiero que me lo tomes como negativo antes que
+    // pasarme un rato largo rellenando datos a lo tonto como si fuese 2015)
 
     static Repositorio()
     {
@@ -139,10 +141,10 @@ public static class Repositorio
 
     private static void CargarDocumentos()
     {
-        // Empleado que registró los documentos de prueba (admin)
+        // Admin
         var empleadoAlta = _empleados[0];
 
-        // Libros (Codigo = ISBN)
+        // Libros
         var libros = new List<Libro>
         {
             new Libro
@@ -233,7 +235,7 @@ public static class Repositorio
             }
         };
 
-        // Audiolibros (Codigo = ISBN de edición audio)
+        // Audiolibros
         var audiolibros = new List<Audiolibro>
         {
             new Audiolibro
@@ -245,7 +247,7 @@ public static class Repositorio
                 AnioPublicacion = 1997,
                 Genero = "Fantasía",
                 Narrador = "Carlos Ponce",
-                DuracionMinutos = 520,
+                DuracionSegundos = 31200,
                 Formato = FormatoAudio.MP3,
                 EmpleadoAlta = empleadoAlta
             },
@@ -258,7 +260,7 @@ public static class Repositorio
                 AnioPublicacion = 2007,
                 Genero = "Fantasía épica",
                 Narrador = "Raúl Llorens",
-                DuracionMinutos = 1680,
+                DuracionSegundos = 100800,
                 Formato = FormatoAudio.MP3,
                 EmpleadoAlta = empleadoAlta
             },
@@ -271,7 +273,7 @@ public static class Repositorio
                 AnioPublicacion = 2011,
                 Genero = "Historia",
                 Narrador = "Miguel Ángel Jenner",
-                DuracionMinutos = 900,
+                DuracionSegundos = 54000,
                 Formato = FormatoAudio.AAC,
                 NumeroDiscos = 2,
                 EmpleadoAlta = empleadoAlta
@@ -284,13 +286,13 @@ public static class Repositorio
 
     private static void CargarEjemplares()
     {
-        // Empleado que registró los ejemplares de prueba (admin)
+        // admin
         var empleadoAlta = _empleados[0];
 
         int ejemplarNum = 1;
         foreach (var documento in _documentos)
         {
-            // Crear 2-3 ejemplares por documento
+            // 2o3 ejemplares por documento
             int numEjemplares = ejemplarNum % 2 == 0 ? 3 : 2;
 
             for (int i = 1; i <= numEjemplares; i++)
@@ -311,7 +313,7 @@ public static class Repositorio
 
     private static void CargarPrestamosHistoricos()
     {
-        // Préstamo 1: Histórico devuelto
+        // devuelto
         var prestamo1 = new Prestamo
         {
             Id = GenerarIdPrestamo(),
@@ -325,7 +327,7 @@ public static class Repositorio
         prestamo1.CalcularFechaDevolucion();
         _ejemplares[0].VecesPrestado++;
 
-        // Préstamo 2: Activo
+        // activo y vencido
         var prestamo2 = new Prestamo
         {
             Id = GenerarIdPrestamo(),
@@ -340,7 +342,7 @@ public static class Repositorio
         prestamo2.CalcularFechaDevolucion();
         ejemplar2.VecesPrestado++;
 
-        // Préstamo 3: Activo con múltiples ejemplares
+        // activo con múltiples ejemplares
         var prestamo3 = new Prestamo
         {
             Id = GenerarIdPrestamo(),
@@ -359,15 +361,15 @@ public static class Repositorio
         ejemplar4.VecesPrestado++;
         ejemplar5.VecesPrestado++;
 
-        // Préstamo 4: Vencido (para pruebas de sanciones)
+        // activo y vencido
         var prestamo4 = new Prestamo
         {
             Id = GenerarIdPrestamo(),
             Usuario = _usuarios[2],
             Empleado = _empleados[1],
-            FechaPrestamo = DateTime.Now.AddDays(-35),
-            FechaDevolucionPrevista = DateTime.Now.AddDays(-14),
-            Estado = EstadoPrestamo.Vencido
+            FechaPrestamo = DateTime.Now.AddDays(-350),
+            FechaDevolucionPrevista = DateTime.Now.AddDays(-140),
+            Estado = EstadoPrestamo.Activo
         };
         var ejemplarVencido = _ejemplares[10];
         ejemplarVencido.Estado = EstadoEjemplar.Prestado;

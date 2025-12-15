@@ -56,6 +56,28 @@ public class FormListadoPrestamos : Form
             Location = new Point(0, 55)
         };
 
+        var btnNuevo = bindingNavigator.AddNewItem;
+        bindingNavigator.AddNewItem = null;
+        if (btnNuevo != null)
+        {
+            btnNuevo.Visible = true;  // Que se vea
+            btnNuevo.Enabled = true;  // Que se pueda pulsar
+            btnNuevo.ToolTipText = "Registrar Nuevo Préstamo"; // Un tooltip útil
+
+            // Asignamos el evento click
+            btnNuevo.Click += (s, e) =>
+            {
+                // Abrimos el formulario de Alta
+                var form = new FormAltaPrestamo();
+                form.MdiParent = this.MdiParent; // Lo mantenemos dentro del MDI
+
+                // Importante: Cuando se cierre el alta, recargamos la lista para ver el nuevo préstamo
+                form.FormClosed += (sender, args) => CargarPrestamos();
+
+                form.Show();
+            };
+        }
+
         // DataGridView
         dgvPrestamos = new DataGridView
         {
@@ -140,7 +162,7 @@ public class FormListadoPrestamos : Form
         var id = dgvPrestamos.Rows[e.RowIndex].Cells["Id"].Value?.ToString();
         if (string.IsNullOrEmpty(id)) return;
 
-        var form = new FormConsultaPrestamo();
+        var form = new FormConsultaPrestamo(id);
         form.MdiParent = MdiParent;
         form.Show();
     }

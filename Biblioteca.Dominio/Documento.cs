@@ -6,53 +6,24 @@ namespace Biblioteca.Dominio;
 /// </summary>
 public abstract class Documento
 {
-    /// <summary>
-    /// ISBN o código único del documento - identificador único.
-    /// </summary>
-    public required string Codigo { get; set; }
+    private string _codigo;
+    public required string Codigo
+    {
+        get => _codigo;
+        set => _codigo = value?.Replace("-", "").Replace(" ", "").Trim() ?? string.Empty;
+    }
 
     public required string Titulo { get; set; }
-
     public required string Autor { get; set; }
-
     public string Editorial { get; set; } = string.Empty;
-
     public int AnioPublicacion { get; set; }
-
     public string Genero { get; set; } = string.Empty;
-
     public string Idioma { get; set; } = "Español";
-
-    /// <summary>
-    /// Descripción o sinopsis del documento.
-    /// </summary>
     public string Descripcion { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Fecha en que el documento fue añadido al catálogo.
-    /// </summary>
     public DateTime FechaAlta { get; set; } = DateTime.Now;
-
-    /// <summary>
-    /// Empleado que registró el documento en el sistema.
-    /// </summary>
     public required Empleado EmpleadoAlta { get; set; }
-
-    /// <summary>
-    /// Indica si el documento está disponible para préstamo.
-    /// </summary>
     public bool Disponible { get; set; } = true;
-
-    /// <summary>
-    /// Método abstracto que define los días de préstamo según el tipo de documento.
-    /// Permite el polimorfismo en la lógica de negocio.
-    /// </summary>
-    /// <returns>Número de días permitidos para el préstamo.</returns>
     public abstract int GetDiasPrestamo();
-
-    /// <summary>
-    /// Obtiene el tipo de documento como cadena legible.
-    /// </summary>
     public abstract string TipoDocumento { get; }
 
     public override string ToString()

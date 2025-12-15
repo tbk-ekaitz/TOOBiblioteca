@@ -152,7 +152,7 @@ public class FormDevolucion : Form
         }).ToList();
 
         grpPrestamo.Enabled = true;
-        btnDevolverPrestamo.Enabled = prestamo.Estado == Biblioteca.Dominio.EstadoPrestamo.Activo || prestamo.Estado == Biblioteca.Dominio.EstadoPrestamo.Vencido;
+        btnDevolverPrestamo.Enabled = prestamo.Estado == Biblioteca.Dominio.EstadoPrestamo.Activo;
     }
 
     private void BtnDevolverPrestamo_Click(object? sender, EventArgs e)

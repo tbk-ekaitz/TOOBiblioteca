@@ -43,11 +43,14 @@ public class FormDocumentos : Form
 
     public int TabSeleccionado => tabControl.SelectedIndex;
 
-    public FormDocumentos()
+    private Empleado _empleado;
+
+    public FormDocumentos(Empleado empleado)
     {
         InitializeComponent();
         CargarDatosCatalogo();
         CargarDatosEstadisticas();
+        _empleado = empleado;
     }
 
     private void InitializeComponent()
@@ -97,6 +100,7 @@ public class FormDocumentos : Form
             RowHeadersVisible = false
         };
         dgvDocumentos.CellFormatting += DgvDocumentos_CellFormatting;
+        dgvDocumentos.CellDoubleClick += DgvDocumentos_CellDoubleClick;
 
         tabCatalogo.Controls.Add(dgvDocumentos);
         tabCatalogo.Controls.Add(pnlFiltros);
@@ -300,6 +304,36 @@ public class FormDocumentos : Form
             txtResultadoMes.Text = "Sin datos en este periodo";
             txtAutorMes.Text = "-";
             txtResultadoMes.BackColor = Color.WhiteSmoke;
+        }
+    }
+
+    // Ver y Editar
+
+    private void DgvDocumentos_CellDoubleClick(object? sender, DataGridViewCellEventArgs e)
+    {
+        if (e.RowIndex < 0) return;
+
+        var codigo = dgvDocumentos.Rows[e.RowIndex].Cells["Codigo"].Value?.ToString();
+        if (string.IsNullOrEmpty(codigo)) return;
+
+        // Buscamos el documento completo
+        var documento = NegocioDocumentos.BuscarPorCodigo(codigo);
+
+        if (documento != null)
+        {
+            // Abrimos el formulario con los datos cargados
+            // NOTA: Necesitamos el empleado actual. 
+            // Si no lo tienes en FormDocumentos, pásalo al constructor o usa uno temporal para ver.
+            // Lo ideal es que FormPrincipal se lo pase a FormDocumentos.
+
+            // Como parche rápido si no tienes el empleado aquí, puedes pasar null y controlar el error en el otro lado,
+            // o mejor, asegúrate de que FormDocumentos tenga acceso al _empleadoActual.
+
+            // Suponiendo que tienes _empleadoActual o lo pasas:
+             var form = new FormGestionDocumentos(documento, _empleado);
+            form.ShowDialog();
+
+            CargarDatosCatalogo();
         }
     }
 }

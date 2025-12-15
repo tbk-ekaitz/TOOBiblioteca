@@ -6,34 +6,11 @@ namespace Biblioteca.Dominio;
 /// </summary>
 public class Empleado : Usuario
 {
-    /// <summary>
-    /// Nombre de usuario para el login.
-    /// </summary>
     public string NombreUsuario { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Contraseña del empleado (en producción debería estar hasheada).
-    /// </summary>
     public required string Password { get; set; }
-
-    /// <summary>
-    /// Rol del empleado que determina sus permisos en el sistema.
-    /// </summary>
     public required Role Rol { get; set; }
-
-    /// <summary>
-    /// Fecha de contratación del empleado.
-    /// </summary>
     public DateTime FechaContratacion { get; set; } = DateTime.Now;
-
-    /// <summary>
-    /// Indica si el empleado está activo en el sistema.
-    /// </summary>
     public bool Activo { get; set; } = true;
-
-    /// <summary>
-    /// Número de empleado único.
-    /// </summary>
     public string NumeroEmpleado { get; set; } = string.Empty;
 
     public override string ToString()

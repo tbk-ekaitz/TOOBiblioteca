@@ -35,6 +35,16 @@ public class FormConsultaPrestamo : Form
         InitializeComponent();
     }
 
+    public FormConsultaPrestamo(string idPrestamo) : this()
+    {
+        // 1. Pre-llenar el campo de texto
+        txtIdPrestamo.Text = idPrestamo;
+
+        // 2. Ejecutar automáticamente la búsqueda para mostrar los datos
+        // Simulamos el click del botón Buscar
+        BtnBuscar_Click(this, EventArgs.Empty);
+    }
+
     private void InitializeComponent()
     {
         Text = "Consultar Préstamo";
