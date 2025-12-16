@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Biblioteca.Dominio\Biblioteca.Dominio.csproj" />
-    <ProjectReference Include="..\Biblioteca.Datos\Biblioteca.Datos.csproj" />
   </ItemGroup>
 
 </Project>

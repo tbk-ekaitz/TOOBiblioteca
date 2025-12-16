@@ -1,12 +1,13 @@
 using Biblioteca.Dominio;
 
-namespace Biblioteca.Datos;
+namespace Biblioteca.Negocio.Persistencia;
 
 /// <summary>
 /// Repositorio central de datos simulados.
 /// Actúa como una base de datos en memoria con datos de prueba precargados.
+/// Internal en Capa de Negocio
 /// </summary>
-public static class Repositorio
+internal static class Repositorio
 {
     #region Colecciones de Datos
 
@@ -20,7 +21,7 @@ public static class Repositorio
 
     #endregion
 
-    #region Carga de Datos de Prueba 
+    #region Carga de Datos de Prueba
 
     static Repositorio()
     {
@@ -38,9 +39,9 @@ public static class Repositorio
             new Empleado
             {
                 DNI = "12345678A",
-                Nombre = "Ana",
-                Apellidos = "García López",
-                Email = "ana.garcia@biblioteca.com",
+                Nombre = "Ad",
+                Apellidos = "Ming",
+                Email = "admin@biblioteca.com",
                 Telefono = "600111222",
                 NombreUsuario = "admin",
                 Password = "admin123",
@@ -51,42 +52,42 @@ public static class Repositorio
             new Empleado
             {
                 DNI = "23456789B",
-                Nombre = "Carlos",
-                Apellidos = "Martínez Ruiz",
-                Email = "carlos.martinez@biblioteca.com",
+                Nombre = "Sala",
+                Apellidos = "1",
+                Email = "sala1@biblioteca.com",
                 Telefono = "600222333",
-                NombreUsuario = "carlos",
+                NombreUsuario = "sala1",
                 Password = "sala123",
                 Rol = Role.PersonalSala,
                 NumeroEmpleado = "EMP002",
-                FechaContratacion = new DateTime(2021, 3, 10)
+                FechaContratacion = new DateTime(2020, 1, 15)
             },
             new Empleado
             {
                 DNI = "34567890C",
-                Nombre = "María",
-                Apellidos = "Fernández Díaz",
-                Email = "maria.fernandez@biblioteca.com",
+                Nombre = "Adquisiciones",
+                Apellidos = "1",
+                Email = "adquisiciones1@biblioteca.com",
                 Telefono = "600333444",
-                NombreUsuario = "maria",
+                NombreUsuario = "adq1",
                 Password = "adq123",
                 Rol = Role.PersonalAdquisiciones,
                 NumeroEmpleado = "EMP003",
-                FechaContratacion = new DateTime(2022, 6, 20)
+                FechaContratacion = new DateTime(2020, 1, 15)
             }
         };
     }
 
-    private static void CargarUsuarios()
+    private static void CargarUsuarios() //!!! aca saque los datos con LLM. Losiento pero no pretendere que no hay LLMs, rellenandolos a mano cosas que perfectamente pueden ser "23ewdcsdf"...
     {
         _usuarios = new List<Usuario>
         {
             new Usuario
             {
                 DNI = "11111111A",
-                Nombre = "Pedro",
-                Apellidos = "Sánchez Pérez",
-                Email = "pedro.sanchez@email.com",
+                Nombre = "Pepe",
+                Apellidos = "Pérez Pérez",
+                Email = "pepe.sanchez@email.com",
                 Telefono = "611111111",
                 Direccion = "Calle Mayor 1, Madrid",
                 FechaAlta = new DateTime(2023, 1, 10)
@@ -136,7 +137,7 @@ public static class Repositorio
         };
     }
 
-    private static void CargarDocumentos()
+    private static void CargarDocumentos() //!!! aca saque los datos con LLM. Losiento pero no pretendere que no hay LLMs, rellenandolos a mano cosas que perfectamente pueden ser "23ewdcsdf"...
     {
         // admin
         var empleadoAlta = _empleados[0];
@@ -235,19 +236,6 @@ public static class Repositorio
         {
             new Audiolibro
             {
-                Codigo = "978-84-9838-501-5",
-                Titulo = "Harry Potter y la piedra filosofal",
-                Autor = "J.K. Rowling",
-                Editorial = "Salamandra Audio",
-                AnioPublicacion = 1997,
-                Genero = "Fantasía",
-                Narrador = "Carlos Ponce",
-                DuracionSegundos = 31200,
-                Formato = FormatoAudio.MP3,
-                EmpleadoAlta = empleadoAlta
-            },
-            new Audiolibro
-            {
                 Codigo = "978-84-01-35267-8",
                 Titulo = "El nombre del viento",
                 Autor = "Patrick Rothfuss",
@@ -256,6 +244,19 @@ public static class Repositorio
                 Genero = "Fantasía épica",
                 Narrador = "Raúl Llorens",
                 DuracionSegundos = 100800,
+                Formato = FormatoAudio.MP3,
+                EmpleadoAlta = empleadoAlta
+            },
+            new Audiolibro
+            {
+                Codigo = "978-84-9838-501-5",
+                Titulo = "Harry Potter y la piedra filosofal",
+                Autor = "J.K. Rowling",
+                Editorial = "Salamandra Audio",
+                AnioPublicacion = 1997,
+                Genero = "Fantasía",
+                Narrador = "Carlos Ponce",
+                DuracionSegundos = 31200,
                 Formato = FormatoAudio.MP3,
                 EmpleadoAlta = empleadoAlta
             },

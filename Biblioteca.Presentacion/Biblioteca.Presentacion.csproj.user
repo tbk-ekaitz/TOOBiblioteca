@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup />
+  <ItemGroup>
+    <Compile Update="Controles\ucDetalleUsuario.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Formularios\FormAltaPrestamo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Formularios\FormBajaUsuario.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Formularios\FormConsultaPrestamo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Formularios\FormDevolucion.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Formularios\FormDisponibilidad.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Formularios\FormDocumentos.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Formularios\FormGestionDocumentos.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Formularios\FormGestionEjemplares.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Formularios\FormGestionUsuario.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Formularios\FormListadoPrestamos.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Formularios\FormListados.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Formularios\FormLogin.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Formularios\FormPrestamosFueraPlazo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Formularios\FormPrincipal.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Formularios\FormSolicitarDNI.cs">
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
+</Project>
