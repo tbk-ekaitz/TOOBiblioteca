@@ -87,7 +87,7 @@ internal static class Repositorio
                 DNI = "11111111A",
                 Nombre = "Pepe",
                 Apellidos = "Pérez Pérez",
-                Email = "pepe.sanchez@email.com",
+                Email = "pepe.perez@email.com",
                 Telefono = "611111111",
                 Direccion = "Calle Mayor 1, Madrid",
                 FechaAlta = new DateTime(2023, 1, 10)
