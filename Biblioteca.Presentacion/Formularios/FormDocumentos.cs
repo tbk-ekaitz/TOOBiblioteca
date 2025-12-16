@@ -5,8 +5,8 @@ namespace Biblioteca.Presentacion.Formularios;
 
 /// <summary>
 /// Formulario unificado de Documentos.
-/// Tab 0: Catálogo (Búsqueda y listado).
-/// Tab 1: Estadísticas (Dashboard y análisis).
+/// Tab 0: Catálogo
+/// Tab 1: Estadísticas
 /// </summary>
 public class FormDocumentos : Form
 {
@@ -14,7 +14,7 @@ public class FormDocumentos : Form
     private TabPage tabCatalogo;
     private TabPage tabEstadisticas;
 
-    // === CONTROLES TAB CATÁLOGO ===
+    // tab catalogo
     private DataGridView dgvDocumentos;
     private ComboBox cboTipo;
     private ComboBox cboGenero;
@@ -23,23 +23,23 @@ public class FormDocumentos : Form
     private Button btnLimpiar;
     private Label lblResultados;
 
-    // === CONTROLES TAB ESTADÍSTICAS ===
-    // Sección 1: Totales
+    //tab estadisticas
+    // totales
     private Label lblTotalLibros;
     private Label lblTotalAudiolibros;
     private Label lblMasLeidoHistorico;
 
-    // Sección 2: Filtro Mensual (Lo que antes era el popup FormDocumentoMasLeido)
+    // mensual (antes FormDocumentoMasLeido)
     private GroupBox grpMes;
     private ComboBox cmbMes;
     private NumericUpDown nudAnio;
     private Button btnConsultarMes;
-    private TextBox txtResultadoMes; // Para mostrar el título
-    private TextBox txtAutorMes;     // Para mostrar el autor
+    private TextBox txtResultadoMes;
+    private TextBox txtAutorMes;
 
-    // Sección 3: Gráficos/Tablas
-    private DataGridView dgvTopPrestados; // Top 5
-    private DataGridView dgvPorGenero;    // Distribución
+    // tablas
+    private DataGridView dgvTopPrestados;
+    private DataGridView dgvPorGenero;
 
     public int TabSeleccionado => tabControl.SelectedIndex;
 
@@ -55,15 +55,13 @@ public class FormDocumentos : Form
 
     private void InitializeComponent()
     {
-        Text = "Documentos"; // Renombrado como pediste
+        Text = "Documentos";
         Size = new Size(1100, 700);
         StartPosition = FormStartPosition.CenterParent;
 
         tabControl = new TabControl { Dock = DockStyle.Fill };
 
-        // ==========================================
-        // TAB 1: CATÁLOGO (Manteniendo lo que ya tenías)
-        // ==========================================
+        // tab catalogo
         tabCatalogo = new TabPage("Catálogo");
         
         var pnlFiltros = new Panel { Dock = DockStyle.Top, Height = 60, BackColor = Color.WhiteSmoke };
@@ -105,13 +103,10 @@ public class FormDocumentos : Form
         tabCatalogo.Controls.Add(dgvDocumentos);
         tabCatalogo.Controls.Add(pnlFiltros);
 
-        // ==========================================
-        // TAB 2: ESTADÍSTICAS (El nuevo Dashboard unificado)
-        // ==========================================
+        // tab estadisticas
         tabEstadisticas = new TabPage("Estadísticas");
         tabEstadisticas.Padding = new Padding(10);
-
-        // -- Panel Superior: Resumen --
+        
         var pnlResumen = new Panel { Dock = DockStyle.Top, Height = 80, BackColor = Color.AliceBlue };
         pnlResumen.Padding = new Padding(10);
 
@@ -121,12 +116,10 @@ public class FormDocumentos : Form
 
         pnlResumen.Controls.AddRange(new Control[] { lblTotalLibros, lblTotalAudiolibros, lblMasLeidoHistorico });
 
-        // -- Panel Izquierdo: Filtro Mes y Top 5 --
         var splitStats = new SplitContainer { Dock = DockStyle.Fill, Orientation = Orientation.Vertical, SplitterDistance = 450 };
         splitStats.Panel1.Padding = new Padding(10);
         splitStats.Panel2.Padding = new Padding(10);
 
-        // Grupo Filtro Mes (Absorbido de FormDocumentoMasLeido)
         grpMes = new GroupBox { Text = "🔎 Más Leído por Mes", Dock = DockStyle.Top, Height = 180 };
         
         var lblMes = new Label { Text = "Mes:", Location = new Point(20, 30), AutoSize = true };
@@ -145,8 +138,7 @@ public class FormDocumentos : Form
         
         grpMes.Controls.AddRange(new Control[] { lblMes, cmbMes, lblAnio, nudAnio, btnConsultarMes, txtResultadoMes, txtAutorMes });
 
-        // Grupo Top 5
-        var grpTop = new GroupBox { Text = "🏆 Top 5 Más Prestados", Dock = DockStyle.Fill }; // Fill el resto del panel izquierdo
+        var grpTop = new GroupBox { Text = "🏆 Top 5 Más Prestados", Dock = DockStyle.Fill };
         dgvTopPrestados = new DataGridView
         {
             Dock = DockStyle.Fill,
@@ -159,10 +151,9 @@ public class FormDocumentos : Form
         grpTop.Controls.Add(dgvTopPrestados);
 
         splitStats.Panel1.Controls.Add(grpTop);
-        splitStats.Panel1.Controls.Add(grpMes); // Orden: Mes arriba, Top abajo (por Dock)
-        grpTop.BringToFront(); // Asegurar que Top llene el espacio restante debajo de Mes
+        splitStats.Panel1.Controls.Add(grpMes);
+        grpTop.BringToFront();
 
-        // -- Panel Derecho: Géneros --
         var grpGeneros = new GroupBox { Text = "📊 Préstamos por Género", Dock = DockStyle.Fill };
         dgvPorGenero = new DataGridView
         {
@@ -184,21 +175,35 @@ public class FormDocumentos : Form
         Controls.Add(tabControl);
     }
 
-    /// <summary>
-    /// Permite seleccionar qué pestaña mostrar al abrir el formulario.
-    /// </summary>
     public void SeleccionarTab(int index)
     {
         if (index >= 0 && index < tabControl.TabCount)
         {
             tabControl.SelectedIndex = index;
-            if(index == 1) CargarDatosEstadisticas(); // Recargar al mostrar
+            if(index == 1) CargarDatosEstadisticas();
         }
     }
 
-    // ==========================================
-    // LÓGICA TAB CATÁLOGO
-    // ==========================================
+    private void DgvDocumentos_CellDoubleClick(object? sender, DataGridViewCellEventArgs e)
+    {
+        if (e.RowIndex < 0) return;
+
+        var codigo = dgvDocumentos.Rows[e.RowIndex].Cells["Codigo"].Value?.ToString();
+        if (string.IsNullOrEmpty(codigo)) return;
+
+        var documento = NegocioDocumentos.BuscarPorCodigo(codigo);
+
+        if (documento != null)
+        {
+            var form = new FormGestionDocumentos(documento, _empleado);
+            form.ShowDialog();
+
+            CargarDatosCatalogo();
+        }
+    }
+
+    #region logica catalogo
+
     private void CargarDatosCatalogo()
     {
         var generos = NegocioDocumentos.ObtenerGeneros();
@@ -252,12 +257,12 @@ public class FormDocumentos : Form
         }
     }
 
-    // ==========================================
-    // LÓGICA TAB ESTADÍSTICAS
-    // ==========================================
+    #endregion
+
+    #region logica estadisticas
+
     private void CargarDatosEstadisticas()
     {
-        // 1. Resumen Superior
         var (libros, audiolibros) = NegocioDocumentos.ContarPorTipo();
         lblTotalLibros.Text = $"📚 Libros: {libros}";
         lblTotalAudiolibros.Text = $"🎧 Audiolibros: {audiolibros}";
@@ -267,11 +272,8 @@ public class FormDocumentos : Form
             ? $"⭐ Estrella Histórica: {masLeidoHist.Titulo} ({masLeidoHist.Autor})" 
             : "⭐ Estrella Histórica: -";
 
-        // 2. Ejecutar consulta del mes actual por defecto
         BtnConsultarMes_Click(null, null);
 
-        // 3. Cargar Grids
-        // Top 5
         var top5 = NegocioDocumentos.ObtenerTopPrestados(5);
         dgvTopPrestados.DataSource = top5.Select(t => new { 
             Título = t.Documento.Titulo, 
@@ -279,7 +281,6 @@ public class FormDocumentos : Form
             Préstamos = t.VecesPrestado 
         }).ToList();
 
-        // Por Género
         var porGenero = NegocioDocumentos.ObtenerEstadisticasPorGenero();
         dgvPorGenero.DataSource = porGenero.Select(x => new { 
             Género = x.Genero, 
@@ -307,33 +308,6 @@ public class FormDocumentos : Form
         }
     }
 
-    // Ver y Editar
+    #endregion
 
-    private void DgvDocumentos_CellDoubleClick(object? sender, DataGridViewCellEventArgs e)
-    {
-        if (e.RowIndex < 0) return;
-
-        var codigo = dgvDocumentos.Rows[e.RowIndex].Cells["Codigo"].Value?.ToString();
-        if (string.IsNullOrEmpty(codigo)) return;
-
-        // Buscamos el documento completo
-        var documento = NegocioDocumentos.BuscarPorCodigo(codigo);
-
-        if (documento != null)
-        {
-            // Abrimos el formulario con los datos cargados
-            // NOTA: Necesitamos el empleado actual. 
-            // Si no lo tienes en FormDocumentos, pásalo al constructor o usa uno temporal para ver.
-            // Lo ideal es que FormPrincipal se lo pase a FormDocumentos.
-
-            // Como parche rápido si no tienes el empleado aquí, puedes pasar null y controlar el error en el otro lado,
-            // o mejor, asegúrate de que FormDocumentos tenga acceso al _empleadoActual.
-
-            // Suponiendo que tienes _empleadoActual o lo pasas:
-             var form = new FormGestionDocumentos(documento, _empleado);
-            form.ShowDialog();
-
-            CargarDatosCatalogo();
-        }
-    }
 }

@@ -60,7 +60,7 @@ public class FormGestionDocumentos : Form
         int controlX = 120;
         int spacing = 35;
 
-        // Tipo de documento
+        // tipo documento
         lblTipo = new Label { Text = "Tipo:", Location = new Point(labelX, y), AutoSize = true };
         cmbTipo = new ComboBox { Location = new Point(controlX, y - 3), Width = 150, DropDownStyle = ComboBoxStyle.DropDownList };
         cmbTipo.Items.AddRange(new[] { "Libro", "Audiolibro" });
@@ -73,38 +73,38 @@ public class FormGestionDocumentos : Form
         txtISBN = new TextBox { Location = new Point(controlX, y - 3), Width = 200 };
         y += spacing;
 
-        // Título
+        // titulo
         lblTitulo = new Label { Text = "Título:", Location = new Point(labelX, y), AutoSize = true };
         txtTitulo = new TextBox { Location = new Point(controlX, y - 3), Width = 300 };
         y += spacing;
 
-        // Autor
+        // autor
         lblAutor = new Label { Text = "Autor:", Location = new Point(labelX, y), AutoSize = true };
         txtAutor = new TextBox { Location = new Point(controlX, y - 3), Width = 300 };
         y += spacing;
 
-        // Editorial
+        // editorial
         lblEditorial = new Label { Text = "Editorial:", Location = new Point(labelX, y), AutoSize = true };
         txtEditorial = new TextBox { Location = new Point(controlX, y - 3), Width = 200 };
         y += spacing;
 
-        // Género
+        // grnero
         lblGenero = new Label { Text = "Género:", Location = new Point(labelX, y), AutoSize = true };
         txtGenero = new TextBox { Location = new Point(controlX, y - 3), Width = 150 };
         y += spacing;
 
-        // Año
+        // ano
         lblAnio = new Label { Text = "Año:", Location = new Point(labelX, y), AutoSize = true };
         nudAnio = new NumericUpDown { Location = new Point(controlX, y - 3), Width = 80, Minimum = 1000, Maximum = DateTime.Now.Year, Value = DateTime.Now.Year };
         y += spacing + 10;
 
-        // Grupo Libro
+        // libro
         grpLibro = new GroupBox { Text = "Datos del Libro", Location = new Point(20, y), Size = new Size(440, 60) };
         grpLibro.Controls.Add(new Label { Text = "Páginas:", Location = new Point(15, 25), AutoSize = true });
         nudPaginas = new NumericUpDown { Location = new Point(100, 22), Width = 80, Minimum = 1, Maximum = 10000, Value = 100 };
         grpLibro.Controls.Add(nudPaginas);
 
-        // Grupo Audiolibro
+        // audiolibro
         grpAudiolibro = new GroupBox { Text = "Datos del Audiolibro", Location = new Point(20, y), Size = new Size(440, 90), Visible = false };
         grpAudiolibro.Controls.Add(new Label { Text = "Duración (seg):", Location = new Point(15, 25), AutoSize = true });
         nudDuracion = new NumericUpDown { Location = new Point(120, 22), Width = 80, Minimum = 1, Maximum = 1000000, Value = 5400 };
@@ -120,7 +120,7 @@ public class FormGestionDocumentos : Form
 
         y += 100;
 
-        // Botones
+        // botones
         btnGuardar = new Button { Text = "Guardar", Location = new Point(150, y + 10), Size = new Size(90, 30) };
         btnGuardar.Click += BtnGuardar_Click;
 
@@ -135,11 +135,7 @@ public class FormGestionDocumentos : Form
     public FormGestionDocumentos(Documento documento, Empleado empleado) : this(Modo.Modificar, empleado)
     {
         _documentoActual = documento;
-
-        // Cambiamos el título de la ventana
         Text = $"Detalles: {documento.Titulo}";
-
-        // Cargamos los datos en los controles
         CargarDatos();
     }
 
@@ -147,9 +143,8 @@ public class FormGestionDocumentos : Form
     {
         if (_documentoActual == null) return;
 
-        // 1. Cargar Datos Comunes
         txtISBN.Text = _documentoActual.Codigo;
-        txtISBN.ReadOnly = true; // El ID no se debe tocar al editar
+        txtISBN.ReadOnly = true; //!
 
         txtTitulo.Text = _documentoActual.Titulo;
         txtAutor.Text = _documentoActual.Autor;
@@ -157,33 +152,26 @@ public class FormGestionDocumentos : Form
         txtGenero.Text = _documentoActual.Genero;
         nudAnio.Value = _documentoActual.AnioPublicacion;
 
-        // 2. Lógica Diferenciada (Libro vs Audiolibro)
         if (_documentoActual is Libro libro)
         {
-            // Configuramos modo Libro
             cmbTipo.SelectedItem = "Libro";
-            cmbTipo.Enabled = false; // No puedes convertir un libro en audio
+            cmbTipo.Enabled = false;
 
-            // Cargar datos específicos
             nudPaginas.Value = libro.NumeroPaginas;
 
-            // Mostrar/Ocultar paneles
             grpLibro.Visible = true;
             grpAudiolibro.Visible = false;
         }
         else if (_documentoActual is Audiolibro audio)
         {
-            // Configuramos modo Audiolibro
             cmbTipo.SelectedItem = "Audiolibro";
             cmbTipo.Enabled = false;
 
-            // Cargar datos específicos
             nudDuracion.Value = audio.DuracionSegundos;
             txtNarrador.Text = audio.Narrador;
             if (Enum.IsDefined(typeof(FormatoAudio), audio.Formato))
                 cmbFormato.SelectedItem = audio.Formato.ToString();
 
-            // Mostrar/Ocultar paneles
             grpLibro.Visible = false;
             grpAudiolibro.Visible = true;
         }

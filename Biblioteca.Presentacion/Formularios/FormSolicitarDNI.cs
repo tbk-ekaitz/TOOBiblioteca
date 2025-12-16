@@ -4,7 +4,7 @@ namespace Biblioteca.Presentacion.Formularios;
 
 /// <summary>
 /// Diálogo pequeño para solicitar DNI antes de buscar/dar de alta un usuario.
-/// Implementa el patrón "Primero Clave" de la Práctica 12.
+/// pr12
 /// </summary>
 public class FormSolicitarDNI : Form
 {
@@ -27,7 +27,6 @@ public class FormSolicitarDNI : Form
 
     private void InitializeComponent()
     {
-        // Configuración del formulario
         string titulo = _modo switch
         {
             Modo.Buscar => "Buscar Usuario",
@@ -43,7 +42,6 @@ public class FormSolicitarDNI : Form
         MaximizeBox = false;
         MinimizeBox = false;
 
-        // Instrucción
         string instruccion = _modo switch
         {
             Modo.Buscar => "Introduzca el DNI del usuario a buscar:",
@@ -140,7 +138,6 @@ public class FormSolicitarDNI : Form
                     lblMensaje.Text = "No se encontró ningún usuario con ese DNI.";
                     return;
                 }
-                // Abrir formulario de detalle
                 var formDetalle = new FormGestionUsuario(usuario, false);
                 formDetalle.MdiParent = MdiParent;
                 formDetalle.Show();
@@ -153,7 +150,6 @@ public class FormSolicitarDNI : Form
                     lblMensaje.Text = "Ya existe un usuario con ese DNI.";
                     return;
                 }
-                // Abrir formulario de alta
                 var formAlta = new FormGestionUsuario(txtDNI.Text);
                 formAlta.MdiParent = MdiParent;
                 formAlta.Show();
@@ -166,7 +162,6 @@ public class FormSolicitarDNI : Form
                     lblMensaje.Text = "No se encontró ningún usuario con ese DNI.";
                     return;
                 }
-                // Confirmar baja
                 var resultado = NegocioUsuarios.BajaUsuario(usuario.DNI);
                 if (resultado.exito)
                 {

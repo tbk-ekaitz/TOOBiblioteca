@@ -6,13 +6,13 @@ namespace Biblioteca.Presentacion.Formularios;
 
 /// <summary>
 /// Formulario de listados con ListBox ordenados y BindingNavigator.
-/// Implementa la Práctica 13 (navegación de datos).
+/// pr13
 /// </summary>
 public class FormListados : Form
 {
     private SplitContainer splitContainer;
 
-    // Panel izquierdo - ListBox
+    // panel izquierdo
     private GroupBox grpListado;
     private ListBox lstUsuarios;
     private ComboBox cboOrden;
@@ -20,7 +20,7 @@ public class FormListados : Form
     private TextBox txtBuscar;
     private Button btnBuscar;
 
-    // Panel derecho - Detalle con BindingNavigator
+    // panel derecho
     private GroupBox grpDetalle;
     private BindingNavigator navUsuarios;
     private BindingSource bsUsuarios;
@@ -53,7 +53,6 @@ public class FormListados : Form
         Size = new Size(900, 550);
         StartPosition = FormStartPosition.CenterParent;
 
-        // SplitContainer
         splitContainer = new SplitContainer
         {
             Dock = DockStyle.Fill,
@@ -61,7 +60,7 @@ public class FormListados : Form
             FixedPanel = FixedPanel.Panel1
         };
 
-        // === PANEL IZQUIERDO ===
+        // izq
         grpListado = new GroupBox
         {
             Text = "Usuarios",
@@ -69,7 +68,6 @@ public class FormListados : Form
             Padding = new Padding(10)
         };
 
-        // Controles de filtro
         lblOrden = new Label
         {
             Text = "Ordenar por:",
@@ -114,7 +112,7 @@ public class FormListados : Form
             lblOrden, cboOrden, txtBuscar, btnBuscar, lstUsuarios
         });
 
-        // === PANEL DERECHO ===
+        // der
         grpDetalle = new GroupBox
         {
             Text = "Detalle del Usuario",
@@ -122,7 +120,6 @@ public class FormListados : Form
             Padding = new Padding(10)
         };
 
-        // BindingSource y BindingNavigator
         bsUsuarios = new BindingSource();
 
         navUsuarios = new BindingNavigator(true)
@@ -133,7 +130,6 @@ public class FormListados : Form
         navUsuarios.AddNewItem.Visible = false;
         navUsuarios.DeleteItem.Visible = false;
 
-        // Campos de detalle
         int y = 70;
         int spacing = 35;
 
@@ -155,7 +151,6 @@ public class FormListados : Form
         lblEstado = new Label { Text = "Estado:", Location = new Point(15, y + spacing * 5), AutoSize = true };
         txtDetalleEstado = new TextBox { Location = new Point(100, y + spacing * 5 - 3), Width = 200, ReadOnly = true };
 
-        // Botones
         btnEditar = new Button
         {
             Text = "Editar",
@@ -184,12 +179,10 @@ public class FormListados : Form
             btnEditar, btnEliminar
         });
 
-        // Ensamblar
         splitContainer.Panel1.Controls.Add(grpListado);
         splitContainer.Panel2.Controls.Add(grpDetalle);
         Controls.Add(splitContainer);
 
-        // Configurar enlace de datos para navegación
         bsUsuarios.CurrentChanged += BsUsuarios_CurrentChanged;
     }
 
@@ -202,12 +195,10 @@ public class FormListados : Form
             _ => NegocioUsuarios.ObtenerTodosOrdenados()
         };
 
-        // Cargar ListBox
         lstUsuarios.DataSource = null;
         lstUsuarios.DataSource = usuarios;
         lstUsuarios.DisplayMember = "NombreCompleto";
 
-        // Cargar BindingSource para navegador
         bsUsuarios.DataSource = new BindingList<Usuario>(usuarios);
 
         if (usuarios.Count > 0)
@@ -240,7 +231,6 @@ public class FormListados : Form
     {
         if (lstUsuarios.SelectedItem is Usuario usuario)
         {
-            // Sincronizar con BindingSource
             bsUsuarios.Position = lstUsuarios.SelectedIndex;
             MostrarDetalle(usuario);
         }
@@ -250,7 +240,6 @@ public class FormListados : Form
     {
         if (bsUsuarios.Current is Usuario usuario)
         {
-            // Sincronizar ListBox con navigator
             if (lstUsuarios.SelectedIndex != bsUsuarios.Position)
             {
                 lstUsuarios.SelectedIndex = bsUsuarios.Position;

@@ -2,7 +2,6 @@ namespace Biblioteca.Dominio;
 
 /// <summary>
 /// Representa un préstamo a un usuario.
-/// Implementa el patrón Maestro-Detalle (un préstamo, múltiples ejemplares).
 /// </summary>
 public class Prestamo
 {

@@ -5,8 +5,6 @@ namespace Biblioteca.Negocio;
 
 /// <summary>
 /// Lógica de negocio para la gestión del catálogo de documentos.
-/// Implementa CRUD, búsquedas avanzadas y estadísticas con LINQ.
-/// Utiliza Codigo como identificador único para documentos.
 /// </summary>
 public static class NegocioDocumentos
 {
@@ -194,7 +192,7 @@ public static class NegocioDocumentos
     public static DateTime? ObtenerFechaDisponibilidad(string codigoDocumento)
     {
         if (HayEjemplaresDisponibles(codigoDocumento))
-            return DateTime.Now; // Ya está disponible
+            return DateTime.Now;
 
         var prestamosDelDocumento = Repositorio.ObtenerPrestamosDeDocumento(codigoDocumento)
             .Where(p => p.Estado == EstadoPrestamo.Activo)
@@ -225,7 +223,6 @@ public static class NegocioDocumentos
         if (string.IsNullOrWhiteSpace(documento.Autor))
             return (false, "El autor es obligatorio.");
 
-        // Verificar código duplicado (solo para nuevos documentos)
         if (esNuevo && Repositorio.ExisteDocumento(documento.Codigo))
             return (false, "Ya existe un documento con ese ISBN.");
 
@@ -239,14 +236,10 @@ public static class NegocioDocumentos
     {
         if (string.IsNullOrWhiteSpace(isbn)) return false;
 
-        // Eliminar guiones y espacios
         var soloDigitos = isbn.Replace("-", "").Replace(" ", "");
 
-        // ISBN-10: 10 caracteres (último puede ser X)
-        // ISBN-13: 13 dígitos
         if (soloDigitos.Length == 10)
         {
-            // Los primeros 9 deben ser dígitos, el último puede ser dígito o X
             for (int i = 0; i < 9; i++)
             {
                 if (!char.IsDigit(soloDigitos[i])) return false;
@@ -255,7 +248,6 @@ public static class NegocioDocumentos
         }
         else if (soloDigitos.Length == 13)
         {
-            // Todos deben ser dígitos
             return soloDigitos.All(char.IsDigit);
         }
 
@@ -362,7 +354,7 @@ public static class NegocioDocumentos
         if (ejemplar.Estado == EstadoEjemplar.Baja)
             return (false, "El ejemplar ya está dado de baja.");
 
-        // Borrado lógico: cambiar estado en vez de eliminar físicamente
+        //! borrado lógico
         ejemplar.Estado = EstadoEjemplar.Baja;
         Repositorio.ActualizarEjemplar(ejemplar);
         return (true, $"Ejemplar {codigoBarras} dado de baja correctamente.");
@@ -520,7 +512,6 @@ public static class NegocioDocumentos
     {
         int totalDocs = Repositorio.ObtenerTodosDocumentos().Count;
 
-        // Obtenemos todos los ejemplares que NO sean Baja (Activos)
         var ejemplaresActivos = Repositorio.ObtenerTodosEjemplares()
             .Where(e => e.Estado != EstadoEjemplar.Baja)
             .ToList();
@@ -528,7 +519,6 @@ public static class NegocioDocumentos
         int totalEjemplares = ejemplaresActivos.Count;
         int prestados = ejemplaresActivos.Count(e => e.Estado == EstadoEjemplar.Prestado);
 
-        // "Sin prestar" son todos los activos menos los prestados (incluye Disponibles, EnReparacion, Reservados)
         int noPrestados = totalEjemplares - prestados;
 
         return (totalDocs, totalEjemplares, prestados, noPrestados);

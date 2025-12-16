@@ -45,7 +45,7 @@ public class FormBajaUsuario : Form
         btnBuscar = new Button { Text = "Buscar", Location = new Point(250, 20), Size = new Size(80, 25) };
         btnBuscar.Click += BtnBuscar_Click;
 
-        // Grupo datos usuario
+        // usuario
         grpUsuario = new GroupBox
         {
             Text = "Datos del Usuario",
@@ -68,7 +68,7 @@ public class FormBajaUsuario : Form
 
         grpUsuario.Controls.AddRange(new Control[] { lblNombre, txtNombre, lblApellidos, txtApellidos, lblEmail, txtEmail, lblEstado, txtEstado });
 
-        // Botones
+        // botones
         btnBaja = new Button { Text = "Dar de Baja", Location = new Point(120, 260), Size = new Size(100, 30), Enabled = false };
         btnBaja.Click += BtnBaja_Click;
 
@@ -103,7 +103,6 @@ public class FormBajaUsuario : Form
             return;
         }
 
-        // Mostrar datos
         txtNombre.Text = usuario.Nombre;
         txtApellidos.Text = usuario.Apellidos;
         txtEmail.Text = usuario.Email;

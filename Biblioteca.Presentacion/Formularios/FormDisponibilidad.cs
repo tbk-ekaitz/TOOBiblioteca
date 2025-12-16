@@ -37,13 +37,13 @@ public class FormDisponibilidad : Form
 
         errorProvider = new ErrorProvider { BlinkStyle = ErrorBlinkStyle.NeverBlink };
 
-        // Búsqueda
+        // busqueda
         lblCodigo = new Label { Text = "Código Documento:", Location = new Point(20, 25), AutoSize = true };
         txtCodigo = new TextBox { Location = new Point(140, 22), Width = 150 };
         btnConsultar = new Button { Text = "Consultar", Location = new Point(310, 20), Size = new Size(100, 25) };
         btnConsultar.Click += BtnConsultar_Click;
 
-        // Grupo resultado
+        // resultado
         grpResultado = new GroupBox { Text = "Información del Documento", Location = new Point(20, 60), Size = new Size(545, 330), Enabled = false };
 
         int y = 25;
@@ -98,7 +98,7 @@ public class FormDisponibilidad : Form
         var documento = NegocioDocumentos.BuscarPorCodigo(txtCodigo.Text.Trim());
         if (documento == null)
         {
-            MessageBox.Show("No se encontró ningún documento con ese código.", "No encontrado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show("No se encontró ningún documento con ese codigo.", "No encontrado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             LimpiarDatos();
             return;
         }
@@ -107,7 +107,6 @@ public class FormDisponibilidad : Form
         txtAutor.Text = documento.Autor;
         txtTipo.Text = documento.TipoDocumento;
 
-        // Usar solo ejemplares activos (excluir dados de baja)
         var ejemplaresDisponibles = NegocioDocumentos.ContarEjemplaresDisponibles(documento.Codigo);
         var totalEjemplaresActivos = NegocioDocumentos.ContarEjemplaresActivos(documento.Codigo);
 
@@ -126,7 +125,6 @@ public class FormDisponibilidad : Form
             txtFechaDisponible.Text = fechaDisponible?.ToString("dd/MM/yyyy") ?? "Desconocida";
         }
 
-        // Cargar solo ejemplares activos (sin los dados de baja)
         var ejemplares = NegocioDocumentos.ObtenerEjemplaresActivos(documento.Codigo);
         dgvEjemplares.DataSource = ejemplares.Select(ej => new
         {
@@ -137,7 +135,6 @@ public class FormDisponibilidad : Form
             //RegistradoPor = ej.EmpleadoAlta.NombreCompleto // naah, innecesario
         }).ToList();
 
-        // Colorear según estado
         foreach (DataGridViewRow row in dgvEjemplares.Rows)
         {
             var estado = row.Cells["Estado"].Value?.ToString();

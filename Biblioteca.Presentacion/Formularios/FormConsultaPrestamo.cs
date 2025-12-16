@@ -37,11 +37,7 @@ public class FormConsultaPrestamo : Form
 
     public FormConsultaPrestamo(string idPrestamo) : this()
     {
-        // 1. Pre-llenar el campo de texto
         txtIdPrestamo.Text = idPrestamo;
-
-        // 2. Ejecutar automáticamente la búsqueda para mostrar los datos
-        // Simulamos el click del botón Buscar
         BtnBuscar_Click(this, EventArgs.Empty);
     }
 
@@ -53,13 +49,13 @@ public class FormConsultaPrestamo : Form
 
         errorProvider = new ErrorProvider { BlinkStyle = ErrorBlinkStyle.NeverBlink };
 
-        // Búsqueda
+        // busqueda
         lblIdPrestamo = new Label { Text = "ID Préstamo:", Location = new Point(20, 25), AutoSize = true };
         txtIdPrestamo = new TextBox { Location = new Point(110, 22), Width = 200 };
         btnBuscar = new Button { Text = "Buscar", Location = new Point(330, 20), Size = new Size(80, 25) };
         btnBuscar.Click += BtnBuscar_Click;
 
-        // Grupo datos
+        // datos
         grpDatos = new GroupBox { Text = "Datos del Préstamo", Location = new Point(20, 60), Size = new Size(595, 330), Enabled = false };
 
         int y = 25;
@@ -174,7 +170,7 @@ public class FormConsultaPrestamo : Form
             if (exito)
             {
                 MessageBox.Show(mensaje, "Renovación Exitosa", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                BtnBuscar_Click(sender, e); // Recargar datos
+                BtnBuscar_Click(sender, e);
             }
             else
             {

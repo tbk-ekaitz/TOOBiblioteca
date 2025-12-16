@@ -11,7 +11,7 @@ public class FormDevolucion : Form
     private TabPage tabPrestamo;
     private TabPage tabEjemplar;
 
-    // Tab Préstamo
+    // tab prestamo
     private Label lblIdPrestamo;
     private TextBox txtIdPrestamo;
     private Button btnBuscarPrestamo;
@@ -27,7 +27,7 @@ public class FormDevolucion : Form
     private DataGridView dgvEjemplaresPrestamo;
     private Button btnDevolverPrestamo;
 
-    // Tab Ejemplar
+    // tab ejemplar
     private Label lblCodigoBarras;
     private TextBox txtCodigoBarras;
     private Button btnBuscarEjemplar;
@@ -55,7 +55,7 @@ public class FormDevolucion : Form
 
         tabControl = new TabControl { Location = new Point(10, 10), Size = new Size(565, 390) };
 
-        // Tab Préstamo Completo
+        // prestamo
         tabPrestamo = new TabPage("Por Préstamo");
 
         lblIdPrestamo = new Label { Text = "ID Préstamo:", Location = new Point(20, 25), AutoSize = true };
@@ -94,7 +94,7 @@ public class FormDevolucion : Form
 
         tabPrestamo.Controls.AddRange(new Control[] { lblIdPrestamo, txtIdPrestamo, btnBuscarPrestamo, grpPrestamo });
 
-        // Tab Ejemplar Individual
+        // ejemplar
         tabEjemplar = new TabPage("Por Ejemplar");
 
         lblCodigoBarras = new Label { Text = "Código Barras:", Location = new Point(20, 25), AutoSize = true };
@@ -184,7 +184,7 @@ public class FormDevolucion : Form
         var ejemplar = NegocioDocumentos.BuscarEjemplarPorCodigoBarras(txtCodigoBarras.Text.Trim());
         if (ejemplar == null)
         {
-            MessageBox.Show("No se encontró ningún ejemplar con ese código.", "No encontrado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show("No se encontró ningún ejemplar con ese codigo.", "No encontrado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
 

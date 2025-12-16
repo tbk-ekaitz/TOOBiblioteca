@@ -32,7 +32,6 @@ public class FormLogin : Form
 
     private void InitializeComponent()
     {
-        // Configuración del formulario
         Text = "Biblioteca - Iniciar Sesión";
         Size = new Size(400, 320);
         StartPosition = FormStartPosition.CenterScreen;
@@ -41,13 +40,12 @@ public class FormLogin : Form
         MinimizeBox = false;
         AcceptButton = null;
 
-        // ErrorProvider para validación
         errorProvider = new ErrorProvider
         {
             BlinkStyle = ErrorBlinkStyle.NeverBlink
         };
 
-        // Logo/Icono
+        // logo
         picLogo = new PictureBox
         {
             Location = new Point(160, 10),
@@ -56,7 +54,7 @@ public class FormLogin : Form
             BackColor = Color.LightSteelBlue
         };
 
-        // Título
+        // titulo
         lblTitulo = new Label
         {
             Text = "Sistema de Gestión de Biblioteca",
@@ -82,7 +80,7 @@ public class FormLogin : Form
         };
         txtDNI.TextChanged += TxtDNI_TextChanged;
 
-        // Password
+        // contrasena
         lblPassword = new Label
         {
             Text = "Contraseña:",
@@ -97,7 +95,7 @@ public class FormLogin : Form
             PasswordChar = '\u25CF'
         };
 
-        // Botones
+        // botones
         btnEntrar = new Button
         {
             Text = "Entrar",
@@ -115,7 +113,6 @@ public class FormLogin : Form
             DialogResult = DialogResult.Cancel
         };
 
-        // Mensaje de error
         lblMensaje = new Label
         {
             Location = new Point(50, 245),
@@ -124,21 +121,18 @@ public class FormLogin : Form
             TextAlign = ContentAlignment.MiddleCenter
         };
 
-        // Añadir controles
         Controls.AddRange(new Control[]
         {
             picLogo, lblTitulo, lblDNI, txtDNI,
             lblPassword, txtPassword, btnEntrar, btnCancelar, lblMensaje
         });
 
-        // Asignar AcceptButton después de crear el botón
         AcceptButton = btnEntrar;
         CancelButton = btnCancelar;
 
-        // Eventos
         txtPassword.KeyPress += TxtPassword_KeyPress;
 
-        // Pre-cargar datos de prueba (solo para desarrollo)
+        //! precargar datos 
         #if DEBUG
         txtDNI.Text = "12345678A";
         txtPassword.Text = "admin123";
@@ -166,7 +160,6 @@ public class FormLogin : Form
         errorProvider.SetError(txtDNI, "");
         errorProvider.SetError(txtPassword, "");
 
-        // Validar DNI vacío
         if (string.IsNullOrWhiteSpace(txtDNI.Text))
         {
             errorProvider.SetError(txtDNI, "Introduzca el DNI.");
@@ -175,7 +168,6 @@ public class FormLogin : Form
             return;
         }
 
-        // Validar formato DNI
         if (!NegocioUsuarios.ValidarFormatoDNI(txtDNI.Text))
         {
             errorProvider.SetError(txtDNI, "El formato del DNI no es válido (8 números + 1 letra).");
@@ -184,7 +176,6 @@ public class FormLogin : Form
             return;
         }
 
-        // Validar contraseña vacía
         if (string.IsNullOrWhiteSpace(txtPassword.Text))
         {
             errorProvider.SetError(txtPassword, "Introduzca la contraseña.");
@@ -193,7 +184,6 @@ public class FormLogin : Form
             return;
         }
 
-        // Intentar login por DNI
         var empleado = NegocioUsuarios.ValidarLoginPorDNI(txtDNI.Text.Trim(), txtPassword.Text);
 
         if (empleado != null)

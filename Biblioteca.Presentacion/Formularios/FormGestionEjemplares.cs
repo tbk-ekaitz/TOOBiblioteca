@@ -39,13 +39,13 @@ public class FormGestionEjemplares : Form
 
         errorProvider = new ErrorProvider { BlinkStyle = ErrorBlinkStyle.NeverBlink };
 
-        // Búsqueda por código
+        // busqueda
         lblCodigo = new Label { Text = "Código Documento:", Location = new Point(20, 25), AutoSize = true };
         txtCodigo = new TextBox { Location = new Point(140, 22), Width = 150 };
         btnBuscar = new Button { Text = "Buscar", Location = new Point(310, 20), Size = new Size(80, 25) };
         btnBuscar.Click += BtnBuscar_Click;
 
-        // Grupo documento
+        // documento
         grpDocumento = new GroupBox { Text = "Documento", Location = new Point(20, 60), Size = new Size(640, 80), Enabled = false };
         lblTitulo = new Label { Text = "Título:", Location = new Point(15, 25), AutoSize = true };
         txtTitulo = new TextBox { Location = new Point(70, 22), Width = 300, ReadOnly = true };
@@ -53,7 +53,7 @@ public class FormGestionEjemplares : Form
         txtAutor = new TextBox { Location = new Point(70, 47), Width = 200, ReadOnly = true };
         grpDocumento.Controls.AddRange(new Control[] { lblTitulo, txtTitulo, lblAutor, txtAutor });
 
-        // Grid de ejemplares
+        // gird
         dgvEjemplares = new DataGridView
         {
             Location = new Point(20, 150),
@@ -66,7 +66,7 @@ public class FormGestionEjemplares : Form
         };
         dgvEjemplares.CellFormatting += DgvEjemplares_CellFormatting;
 
-        // Grupo nuevo ejemplar
+        // nuevo ej
         grpNuevoEjemplar = new GroupBox { Text = "Nuevo Ejemplar", Location = new Point(20, 340), Size = new Size(400, 60), Enabled = false };
         lblUbicacion = new Label { Text = "Ubicación:", Location = new Point(15, 25), AutoSize = true };
         txtUbicacion = new TextBox { Location = new Point(85, 22), Width = 200 };
@@ -74,7 +74,7 @@ public class FormGestionEjemplares : Form
         btnAltaEjemplar.Click += BtnAltaEjemplar_Click;
         grpNuevoEjemplar.Controls.AddRange(new Control[] { lblUbicacion, txtUbicacion, btnAltaEjemplar });
 
-        // Botón baja ejemplar
+        // baja ej
         btnBajaEjemplar = new Button { Text = "Dar de Baja Ejemplar Seleccionado", Location = new Point(440, 355), Size = new Size(220, 30), Enabled = false };
         btnBajaEjemplar.Click += BtnBajaEjemplar_Click;
 
@@ -189,7 +189,7 @@ public class FormGestionEjemplares : Form
         {
             if (e.Value?.ToString() == "Baja")
             {
-                // Colorear toda la fila en gris para indicar que está dado de baja
+                // baja <-> gris
                 dgvEjemplares.Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.LightGray;
                 dgvEjemplares.Rows[e.RowIndex].DefaultCellStyle.ForeColor = Color.DarkGray;
             }

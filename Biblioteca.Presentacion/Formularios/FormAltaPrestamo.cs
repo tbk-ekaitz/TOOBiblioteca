@@ -4,19 +4,19 @@ using Biblioteca.Negocio;
 namespace Biblioteca.Presentacion.Formularios;
 
 /// <summary>
-/// Formulario para Alta de Préstamo (Maestro-Detalle).
+/// Formulario para Alta de Préstamo
 /// Selección de usuario + añadir múltiples ejemplares.
-/// Implementa la Práctica 13 (relación maestro-detalle).
+/// pr13
 /// </summary>
 public class FormAltaPrestamo : Form
 {
-    // Sección Usuario (Maestro)
+    // usuario
     private GroupBox grpUsuario;
     private ComboBox cboUsuario;
     private Label lblInfoUsuario;
     private Label lblEstadoUsuario;
 
-    // Sección Ejemplares (Detalle)
+    // ejemplares
     private GroupBox grpEjemplares;
     private TextBox txtCodigoBarras;
     private Button btnAgregar;
@@ -24,22 +24,25 @@ public class FormAltaPrestamo : Form
     private Button btnQuitar;
     private Label lblTotalEjemplares;
 
-    // Sección Resumen
+    // resumen
     private GroupBox grpResumen;
     private Label lblFechaPrestamo;
     private Label lblFechaDevolucion;
 
-    // Botones
+    // botones
     private Button btnConfirmar;
     private Button btnCancelar;
 
     private List<Ejemplar> _ejemplaresSeleccionados = new();
     private Usuario? _usuarioSeleccionado;
 
-    public FormAltaPrestamo()
+    private Empleado empleado;
+
+    public FormAltaPrestamo(Empleado empleado)
     {
         InitializeComponent();
         CargarUsuarios();
+        this.empleado = empleado;
     }
 
     private void InitializeComponent()
@@ -50,7 +53,7 @@ public class FormAltaPrestamo : Form
         FormBorderStyle = FormBorderStyle.FixedSingle;
         MaximizeBox = false;
 
-        // === SECCIÓN USUARIO (MAESTRO) ===
+        // usuariio
         grpUsuario = new GroupBox
         {
             Text = "1. Seleccionar Usuario",
@@ -92,7 +95,7 @@ public class FormAltaPrestamo : Form
             lblUsuario, cboUsuario, lblInfoUsuario, lblEstadoUsuario
         });
 
-        // === SECCIÓN EJEMPLARES (DETALLE) ===
+        // ejemplares
         grpEjemplares = new GroupBox
         {
             Text = "2. Añadir Ejemplares",
@@ -150,7 +153,7 @@ public class FormAltaPrestamo : Form
             lblCodigo, txtCodigoBarras, btnAgregar, lstEjemplares, btnQuitar, lblTotalEjemplares
         });
 
-        // === SECCIÓN RESUMEN ===
+        // resumen
         grpResumen = new GroupBox
         {
             Text = "3. Resumen del Préstamo",
@@ -175,7 +178,7 @@ public class FormAltaPrestamo : Form
 
         grpResumen.Controls.AddRange(new Control[] { lblFechaPrestamo, lblFechaDevolucion });
 
-        // === BOTONES ===
+        // botones
         btnConfirmar = new Button
         {
             Text = "Confirmar Préstamo",
@@ -193,7 +196,8 @@ public class FormAltaPrestamo : Form
         };
         btnCancelar.Click += (s, e) => Close();
 
-        // Añadir controles
+        //;;;
+
         Controls.AddRange(new Control[]
         {
             grpUsuario, grpEjemplares, grpResumen, btnConfirmar, btnCancelar
@@ -214,21 +218,19 @@ public class FormAltaPrestamo : Form
         {
             _usuarioSeleccionado = usuario;
 
-            // Mostrar info
             lblInfoUsuario.Text = $"DNI: {usuario.DNI} | Alta: {usuario.FechaAlta:dd/MM/yyyy}";
 
-            // Verificar si puede pedir préstamos
             var (puede, motivo) = NegocioUsuarios.PuedeRealizarPrestamo(usuario.DNI);
 
             if (puede)
             {
-                lblEstadoUsuario.Text = "✓ Puede solicitar préstamos";
+                lblEstadoUsuario.Text = "Puede solicitar préstamos";
                 lblEstadoUsuario.ForeColor = Color.Green;
                 grpEjemplares.Enabled = true;
             }
             else
             {
-                lblEstadoUsuario.Text = $"✗ {motivo}";
+                lblEstadoUsuario.Text = $"{motivo}";
                 lblEstadoUsuario.ForeColor = Color.Red;
                 grpEjemplares.Enabled = false;
             }
@@ -255,7 +257,6 @@ public class FormAltaPrestamo : Form
             return;
         }
 
-        // Validar ejemplar
         var (puede, motivo) = NegocioPrestamos.ValidarEjemplar(txtCodigoBarras.Text);
 
         if (!puede)
@@ -275,7 +276,6 @@ public class FormAltaPrestamo : Form
             return;
         }
 
-        // Verificar duplicados
         if (_ejemplaresSeleccionados.Any(e => e.CodigoBarras == ejemplar.CodigoBarras))
         {
             MessageBox.Show("Este ejemplar ya está en la lista.", "Aviso",
@@ -285,11 +285,9 @@ public class FormAltaPrestamo : Form
             return;
         }
 
-        // Añadir a la lista
         _ejemplaresSeleccionados.Add(ejemplar);
         lstEjemplares.Items.Add($"{ejemplar.CodigoBarras} - {ejemplar.Documento?.Titulo ?? "Sin título"}");
 
-        // Actualizar UI
         txtCodigoBarras.Clear();
         txtCodigoBarras.Focus();
         ActualizarResumen();
@@ -314,7 +312,6 @@ public class FormAltaPrestamo : Form
 
         if (_ejemplaresSeleccionados.Count > 0)
         {
-            // Calcular fecha de devolución
             int maxDias = _ejemplaresSeleccionados
                 .Where(e => e.Documento != null)
                 .Select(e => e.Documento!.GetDiasPrestamo())
@@ -342,10 +339,6 @@ public class FormAltaPrestamo : Form
         if (_usuarioSeleccionado == null || _ejemplaresSeleccionados.Count == 0)
             return;
 
-        // Obtener el empleado actual (en una implementación real vendría del contexto)
-        var empleadoDNI = "23456789B"; // DNI del empleado logueado (PersonalSala)
-
-        // Validación final
         var validacion = NegocioPrestamos.ValidarPrestamo(_usuarioSeleccionado.DNI, _ejemplaresSeleccionados);
         if (!validacion.puede)
         {
@@ -354,7 +347,6 @@ public class FormAltaPrestamo : Form
             return;
         }
 
-        // Confirmar
         var confirmacion = MessageBox.Show(
             $"¿Confirmar préstamo de {_ejemplaresSeleccionados.Count} ejemplar(es) a {_usuarioSeleccionado.NombreCompleto}?",
             "Confirmar Préstamo",
@@ -364,11 +356,10 @@ public class FormAltaPrestamo : Form
         if (confirmacion != DialogResult.Yes)
             return;
 
-        // Registrar préstamo
         var (exito, mensaje, prestamo) = NegocioPrestamos.RegistrarPrestamo(
             _usuarioSeleccionado.DNI,
             _ejemplaresSeleccionados,
-            empleadoDNI);
+            this.empleado);
 
         if (exito)
         {

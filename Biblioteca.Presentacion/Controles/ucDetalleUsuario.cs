@@ -45,7 +45,6 @@ public partial class ucDetalleUsuario : UserControl
         errorProvider = new ErrorProvider();
         ((ISupportInitialize)errorProvider).BeginInit();
 
-        // Crear controles
         lblDNI = new Label { Text = "DNI:", Location = new Point(10, 15), AutoSize = true };
         lblNombre = new Label { Text = "Nombre:", Location = new Point(10, 45), AutoSize = true };
         lblApellidos = new Label { Text = "Apellidos:", Location = new Point(10, 75), AutoSize = true };
@@ -76,7 +75,6 @@ public partial class ucDetalleUsuario : UserControl
             Enabled = false
         };
 
-        // Añadir controles
         Controls.AddRange(new Control[]
         {
             lblDNI, lblNombre, lblApellidos, lblEmail, lblTelefono, lblDireccion,
@@ -84,7 +82,6 @@ public partial class ucDetalleUsuario : UserControl
             chkSancionado, dtpFechaFinSancion
         });
 
-        // Configurar UserControl
         Size = new Size(380, 230);
         BorderStyle = BorderStyle.FixedSingle;
 
@@ -108,7 +105,7 @@ public partial class ucDetalleUsuario : UserControl
         }
     }
 
-    #region Validaciones con ErrorProvider
+    #region Validaciones
 
     private void TxtDNI_Validating(object? sender, CancelEventArgs e)
     {
@@ -169,11 +166,8 @@ public partial class ucDetalleUsuario : UserControl
 
     #endregion
 
-    #region Propiedades Públicas
+    #region Propiedades publicas
 
-    /// <summary>
-    /// Obtiene o establece el usuario mostrado en el control.
-    /// </summary>
     [Browsable(false)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public Usuario? Usuario
@@ -186,9 +180,6 @@ public partial class ucDetalleUsuario : UserControl
         }
     }
 
-    /// <summary>
-    /// Indica si el control está en modo solo lectura.
-    /// </summary>
     public bool SoloLectura
     {
         get => txtDNI.ReadOnly;
@@ -205,9 +196,6 @@ public partial class ucDetalleUsuario : UserControl
         }
     }
 
-    /// <summary>
-    /// Indica si el DNI puede ser editado (false para edición de usuarios existentes).
-    /// </summary>
     public bool DNIEditable
     {
         get => !txtDNI.ReadOnly;
@@ -216,11 +204,8 @@ public partial class ucDetalleUsuario : UserControl
 
     #endregion
 
-    #region Métodos Públicos
+    #region Métodos publicos
 
-    /// <summary>
-    /// Carga los datos del usuario en los controles.
-    /// </summary>
     private void CargarDatos()
     {
         if (_usuario == null)
@@ -241,12 +226,9 @@ public partial class ucDetalleUsuario : UserControl
             dtpFechaFinSancion.Value = _usuario.FechaFinSancion.Value;
     }
 
-    /// <summary>
-    /// Obtiene los datos de los controles y los aplica al usuario.
-    /// </summary>
     public Usuario ObtenerDatos()
     {
-        // Si no hay usuario existente, crear uno nuevo con los campos obligatorios
+        // de no haberlo, crea uno con los campos obligatoiros
         if (_usuario == null)
         {
             _usuario = new Usuario
@@ -272,9 +254,6 @@ public partial class ucDetalleUsuario : UserControl
         return usuario;
     }
 
-    /// <summary>
-    /// Limpia todos los campos.
-    /// </summary>
     public void LimpiarCampos()
     {
         txtDNI.Clear();
@@ -289,14 +268,11 @@ public partial class ucDetalleUsuario : UserControl
         errorProvider.Clear();
     }
 
-    /// <summary>
-    /// Valida todos los campos y retorna si son válidos.
-    /// </summary>
     public bool ValidarCampos()
     {
         bool valido = true;
 
-        // Validar DNI
+        // DNI
         if (string.IsNullOrWhiteSpace(txtDNI.Text))
         {
             errorProvider.SetError(txtDNI, "El DNI es obligatorio.");
@@ -312,7 +288,7 @@ public partial class ucDetalleUsuario : UserControl
             errorProvider.SetError(txtDNI, "");
         }
 
-        // Validar Nombre
+        // nombre
         if (string.IsNullOrWhiteSpace(txtNombre.Text))
         {
             errorProvider.SetError(txtNombre, "El nombre es obligatorio.");
@@ -323,7 +299,7 @@ public partial class ucDetalleUsuario : UserControl
             errorProvider.SetError(txtNombre, "");
         }
 
-        // Validar Apellidos
+        // apellidos
         if (string.IsNullOrWhiteSpace(txtApellidos.Text))
         {
             errorProvider.SetError(txtApellidos, "Los apellidos son obligatorios.");
@@ -337,17 +313,11 @@ public partial class ucDetalleUsuario : UserControl
         return valido;
     }
 
-    /// <summary>
-    /// Establece el foco en el campo DNI.
-    /// </summary>
     public void EnfocarDNI()
     {
         txtDNI.Focus();
     }
 
-    /// <summary>
-    /// Establece el DNI inicial (para alta de usuarios).
-    /// </summary>
     public void EstablecerDNI(string dni)
     {
         txtDNI.Text = dni;

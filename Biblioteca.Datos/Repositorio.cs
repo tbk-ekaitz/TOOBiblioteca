@@ -5,7 +5,6 @@ namespace Biblioteca.Datos;
 /// <summary>
 /// Repositorio central de datos simulados.
 /// Actúa como una base de datos en memoria con datos de prueba precargados.
-/// Utiliza identificadores string (DNI, Codigo, CodigoBarras, Id).
 /// </summary>
 public static class Repositorio
 {
@@ -22,8 +21,6 @@ public static class Repositorio
     #endregion
 
     #region Carga de Datos de Prueba 
-    // (OBVIAMENTE rellene los datos con ayuda de LLM, prefiero que me lo tomes como negativo antes que
-    // pasarme un rato largo rellenando datos a lo tonto como si fuese 2015)
 
     static Repositorio()
     {
@@ -141,10 +138,9 @@ public static class Repositorio
 
     private static void CargarDocumentos()
     {
-        // Admin
+        // admin
         var empleadoAlta = _empleados[0];
 
-        // Libros
         var libros = new List<Libro>
         {
             new Libro
@@ -235,7 +231,6 @@ public static class Repositorio
             }
         };
 
-        // Audiolibros
         var audiolibros = new List<Audiolibro>
         {
             new Audiolibro
@@ -292,7 +287,7 @@ public static class Repositorio
         int ejemplarNum = 1;
         foreach (var documento in _documentos)
         {
-            // 2o3 ejemplares por documento
+            //! 2o3 ejemplares por documento
             int numEjemplares = ejemplarNum % 2 == 0 ? 3 : 2;
 
             for (int i = 1; i <= numEjemplares; i++)

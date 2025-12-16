@@ -5,8 +5,6 @@ namespace Biblioteca.Negocio;
 
 /// <summary>
 /// Lógica de negocio para la gestión de usuarios y empleados.
-/// Implementa validaciones, búsquedas LINQ y operaciones CRUD.
-/// Utiliza DNI como identificador único.
 /// </summary>
 public static class NegocioUsuarios
 {
@@ -41,10 +39,7 @@ public static class NegocioUsuarios
     {
         if (empleado == null) return false;
 
-        // Administrador tiene acceso a todo
         if (empleado.Rol == Role.Administrador) return true;
-
-        // Verificar rol específico
         return empleado.Rol == rolRequerido;
     }
 
@@ -165,7 +160,6 @@ public static class NegocioUsuarios
         if (string.IsNullOrWhiteSpace(usuario.Apellidos))
             return (false, "Los apellidos son obligatorios.");
 
-        // Verificar DNI duplicado (solo para nuevos usuarios)
         if (esNuevo && Repositorio.ExisteUsuario(usuario.DNI))
             return (false, "Ya existe un usuario con ese DNI.");
 
@@ -231,7 +225,6 @@ public static class NegocioUsuarios
         if (usuario == null)
             return (false, "No se encontró el usuario.");
 
-        // Verificar préstamos activos
         var prestamosActivos = Repositorio.ObtenerPrestamosActivosPorUsuario(dni);
         if (prestamosActivos.Count > 0)
             return (false, $"No se puede dar de baja al usuario. Tiene {prestamosActivos.Count} préstamo(s) activo(s).");

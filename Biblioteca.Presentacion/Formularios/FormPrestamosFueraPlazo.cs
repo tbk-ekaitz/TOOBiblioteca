@@ -3,7 +3,7 @@ using Biblioteca.Negocio;
 namespace Biblioteca.Presentacion.Formularios;
 
 /// <summary>
-/// Formulario para mostrar préstamos vencidos (fuera de plazo).
+/// Formulario para mostrar préstamos vencidos.
 /// </summary>
 public class FormPrestamosFueraPlazo : Form
 {
@@ -24,14 +24,12 @@ public class FormPrestamosFueraPlazo : Form
         Size = new Size(900, 500);
         StartPosition = FormStartPosition.CenterParent;
 
-        // Botones superiores
         btnRefrescar = new Button { Text = "Refrescar", Location = new Point(20, 20), Size = new Size(100, 30) };
         btnRefrescar.Click += (s, e) => CargarPrestamosVencidos();
 
         btnRegistrarDevolucion = new Button { Text = "Registrar Devolución", Location = new Point(140, 20), Size = new Size(150, 30) };
         btnRegistrarDevolucion.Click += BtnRegistrarDevolucion_Click;
 
-        // DataGridView
         dgvVencidos = new DataGridView
         {
             Location = new Point(20, 65),
@@ -43,7 +41,6 @@ public class FormPrestamosFueraPlazo : Form
             AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
         };
 
-        // Total
         lblTotal = new Label
         {
             Text = "Total vencidos: 0",
@@ -76,7 +73,6 @@ public class FormPrestamosFueraPlazo : Form
         dgvVencidos.DataSource = datos;
         lblTotal.Text = $"Total préstamos vencidos: {vencidos.Count}";
 
-        // Colorear filas según días de retraso
         foreach (DataGridViewRow row in dgvVencidos.Rows)
         {
             var diasRetraso = (int)(row.Cells["DiasRetraso"].Value ?? 0);

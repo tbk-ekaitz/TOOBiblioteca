@@ -38,7 +38,7 @@ public class FormGestionUsuario : Form
     /// </summary>
     public FormGestionUsuario(string dni)
     {
-        _usuario = null; // No crear Usuario hasta guardar (evita error de required)
+        _usuario = null; //! required asique despues
         _dniInicial = dni;
         _esNuevo = true;
         InitializeComponent();
@@ -53,7 +53,6 @@ public class FormGestionUsuario : Form
         FormBorderStyle = FormBorderStyle.FixedSingle;
         MaximizeBox = false;
 
-        // GroupBox Datos
         grpDatos = new GroupBox
         {
             Text = "Datos del Usuario",
@@ -67,7 +66,6 @@ public class FormGestionUsuario : Form
         };
         grpDatos.Controls.Add(ucDetalle);
 
-        // GroupBox Préstamos (solo en edición)
         grpPrestamos = new GroupBox
         {
             Text = "Préstamos Activos",
@@ -83,7 +81,6 @@ public class FormGestionUsuario : Form
         };
         grpPrestamos.Controls.Add(lstPrestamos);
 
-        // Info
         lblInfo = new Label
         {
             Location = new Point(10, 410),
@@ -91,7 +88,6 @@ public class FormGestionUsuario : Form
             ForeColor = Color.Gray
         };
 
-        // Botones
         btnGuardar = new Button
         {
             Text = _esNuevo ? "Dar de Alta" : "Guardar Cambios",
@@ -120,7 +116,6 @@ public class FormGestionUsuario : Form
         ucDetalle.SoloLectura = !editable;
         ucDetalle.DNIEditable = _esNuevo;
 
-        // Para alta de usuarios, prefill el DNI
         if (_esNuevo && !string.IsNullOrEmpty(_dniInicial))
         {
             ucDetalle.EstablecerDNI(_dniInicial);
@@ -130,7 +125,6 @@ public class FormGestionUsuario : Form
 
         if (!_esNuevo && _usuario != null)
         {
-            // Cargar préstamos activos
             var prestamos = NegocioPrestamos.ObtenerActivosPorUsuario(_usuario.DNI);
             lstPrestamos.Items.Clear();
 
@@ -146,14 +140,12 @@ public class FormGestionUsuario : Form
                 }
             }
 
-            // Info
             lblInfo.Text = $"Alta: {_usuario.FechaAlta:dd/MM/yyyy} | Préstamos activos: {prestamos.Count}";
         }
     }
 
     private void BtnGuardar_Click(object? sender, EventArgs e)
     {
-        // Validar campos
         if (!ucDetalle.ValidarCampos())
         {
             MessageBox.Show("Por favor, corrija los errores marcados.",

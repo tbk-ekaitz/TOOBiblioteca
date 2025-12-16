@@ -5,8 +5,6 @@ namespace Biblioteca.Negocio;
 
 /// <summary>
 /// Lógica de negocio para la gestión de préstamos.
-/// Implementa validaciones complejas y cálculo de fechas usando polimorfismo.
-/// Utiliza DNI para usuarios y Id string para préstamos.
 /// </summary>
 public static class NegocioPrestamos
 {
@@ -141,16 +139,13 @@ public static class NegocioPrestamos
     /// </summary>
     public static (bool puede, string motivo) ValidarPrestamo(string dniUsuario, List<Ejemplar> ejemplares)
     {
-        // Verificar usuario
         var usuario = Repositorio.ObtenerUsuarioPorDNI(dniUsuario);
         if (usuario == null)
             return (false, "Usuario no encontrado.");
 
-        // Verificar sanción
         if (usuario.Sancionado && usuario.FechaFinSancion > DateTime.Now)
             return (false, $"El usuario está sancionado hasta {usuario.FechaFinSancion:dd/MM/yyyy}.");
 
-        // Verificar límite de préstamos
         var prestamosActivos = Repositorio.ObtenerPrestamosActivosPorUsuario(dniUsuario);
         int totalEjemplares = prestamosActivos.Sum(p => p.NumeroEjemplares) + ejemplares.Count;
 
@@ -158,7 +153,6 @@ public static class NegocioPrestamos
             return (false, $"Se superaría el límite de {usuario.MaxPrestamos} préstamos. " +
                          $"Actualmente tiene {prestamosActivos.Sum(p => p.NumeroEjemplares)} ejemplar(es) prestado(s).");
 
-        // Verificar ejemplares
         if (ejemplares.Count == 0)
             return (false, "Debe seleccionar al menos un ejemplar.");
 
@@ -198,15 +192,15 @@ public static class NegocioPrestamos
     public static (bool exito, string mensaje, Prestamo? prestamo) RegistrarPrestamo(
         string dniUsuario,
         List<Ejemplar> ejemplares,
-        string dniEmpleado)
+        Empleado empleado)
     {
-        // Validar préstamo
         var validacion = ValidarPrestamo(dniUsuario, ejemplares);
         if (!validacion.puede)
             return (false, validacion.motivo, null);
 
         var usuario = Repositorio.ObtenerUsuarioPorDNI(dniUsuario);
-        var empleado = Repositorio.ObtenerEmpleadoPorDNI(dniEmpleado);
+        //var empleado = Repositorio.ObtenerEmpleadoPorDNI(dniEmpleado);
+        var dniEmpleado = empleado.DNI;
 
         if (usuario == null)
             return (false, "Usuario no encontrado.", null);
@@ -214,17 +208,15 @@ public static class NegocioPrestamos
         if (empleado == null)
             return (false, "Empleado no encontrado.", null);
 
-        // Crear préstamo
         var prestamo = new Prestamo
         {
-            Id = string.Empty, // Se generará en InsertarPrestamo
+            Id = string.Empty,
             Usuario = usuario,
             Empleado = empleado,
             FechaPrestamo = DateTime.Now,
             Estado = EstadoPrestamo.Activo
         };
 
-        // Añadir ejemplares y actualizar su estado
         foreach (var ejemplar in ejemplares)
         {
             ejemplar.Estado = EstadoEjemplar.Prestado;
@@ -233,10 +225,8 @@ public static class NegocioPrestamos
             Repositorio.ActualizarEjemplar(ejemplar);
         }
 
-        // Calcular fecha de devolución usando polimorfismo
         prestamo.CalcularFechaDevolucion();
 
-        // Guardar préstamo
         Repositorio.InsertarPrestamo(prestamo);
 
         return (true,
@@ -258,25 +248,22 @@ public static class NegocioPrestamos
         if (prestamo.Estado != EstadoPrestamo.Activo)
             return (false, $"El préstamo no está activo. Estado actual: {prestamo.Estado}.");
 
-        // Actualizar ejemplares
         foreach (var ejemplar in prestamo.Ejemplares)
         {
             ejemplar.Estado = EstadoEjemplar.Disponible;
             Repositorio.ActualizarEjemplar(ejemplar);
         }
 
-        // Verificar si hubo retraso y aplicar sanción
         string mensajeAdicional = "";
         if (prestamo.EstaVencido)
         {
             int diasRetraso = prestamo.DiasRetraso;
-            int diasSancion = diasRetraso * 2; // 2 días de sanción por cada día de retraso
+            int diasSancion = diasRetraso * 2; //! 2 días de sanción por cada día de retraso
 
             NegocioUsuarios.AplicarSancion(prestamo.Usuario.DNI, diasSancion);
             mensajeAdicional = $" Se ha aplicado una sanción de {diasSancion} días por {diasRetraso} día(s) de retraso.";
         }
 
-        // Actualizar préstamo
         prestamo.Estado = EstadoPrestamo.Devuelto;
         prestamo.FechaDevolucionReal = DateTime.Now;
         Repositorio.ActualizarPrestamo(prestamo);
@@ -297,28 +284,24 @@ public static class NegocioPrestamos
         if (ejemplar.Estado != EstadoEjemplar.Prestado)
             return (false, "El ejemplar no está prestado.");
 
-        // Buscar el préstamo activo que contiene este ejemplar
         var prestamo = Repositorio.ObtenerPrestamosActivos()
             .FirstOrDefault(p => p.Ejemplares.Any(e => e.CodigoBarras == codigoBarras));
 
         if (prestamo == null)
             return (false, "No se encontró un préstamo activo con este ejemplar.");
 
-        // Actualizar el ejemplar
         ejemplar.Estado = EstadoEjemplar.Disponible;
         Repositorio.ActualizarEjemplar(ejemplar);
 
-        // Si era el último ejemplar del préstamo, marcar el préstamo como devuelto
         var ejemplaresPendientes = prestamo.Ejemplares.Count(e => e.Estado == EstadoEjemplar.Prestado);
 
         string mensajeAdicional = "";
         if (ejemplaresPendientes == 0)
         {
-            // Verificar si hubo retraso y aplicar sanción
             if (prestamo.EstaVencido)
             {
                 int diasRetraso = prestamo.DiasRetraso;
-                int diasSancion = diasRetraso * 2;
+                int diasSancion = diasRetraso * 2; //!2
                 NegocioUsuarios.AplicarSancion(prestamo.Usuario.DNI, diasSancion);
                 mensajeAdicional = $" Sanción de {diasSancion} días aplicada por retraso.";
             }
@@ -352,12 +335,10 @@ public static class NegocioPrestamos
         if (prestamo.EstaVencido)
             return (false, "No se puede renovar un préstamo vencido. Debe devolverse primero.");
 
-        // Verificar que el usuario no esté sancionado
         var usuario = Repositorio.ObtenerUsuarioPorDNI(prestamo.Usuario.DNI);
         if (usuario != null && usuario.Sancionado && usuario.FechaFinSancion > DateTime.Now)
             return (false, "No se puede renovar. El usuario está sancionado.");
 
-        // Extender fecha de devolución usando polimorfismo
         int diasExtension = prestamo.Ejemplares
             .Select(e => e.Documento.GetDiasPrestamo())
             .DefaultIfEmpty(14)
@@ -382,7 +363,6 @@ public static class NegocioPrestamos
         if (prestamo.Estado != EstadoPrestamo.Activo)
             return (false, "Solo se pueden cancelar préstamos activos.");
 
-        // Liberar ejemplares
         foreach (var ejemplar in prestamo.Ejemplares)
         {
             ejemplar.Estado = EstadoEjemplar.Disponible;
@@ -420,8 +400,9 @@ public static class NegocioPrestamos
     /// <summary>
     /// Obtiene préstamos realizados por un empleado.
     /// </summary>
-    public static List<Prestamo> ObtenerPorEmpleado(string dniEmpleado)
+    public static List<Prestamo> ObtenerPorEmpleado(Empleado empleado)
     {
+        var dniEmpleado = empleado.DNI;
         return Repositorio.ObtenerTodosPrestamos()
             .Where(p => p.Empleado.DNI.Equals(dniEmpleado, StringComparison.OrdinalIgnoreCase))
             .OrderByDescending(p => p.FechaPrestamo)
