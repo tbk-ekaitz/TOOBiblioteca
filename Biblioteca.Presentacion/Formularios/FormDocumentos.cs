@@ -269,8 +269,8 @@ public class FormDocumentos : Form
 
         var masLeidoHist = NegocioDocumentos.ObtenerMasLeido();
         lblMasLeidoHistorico.Text = masLeidoHist != null 
-            ? $"⭐ Estrella Histórica: {masLeidoHist.Titulo} ({masLeidoHist.Autor})" 
-            : "⭐ Estrella Histórica: -";
+            ? $"Mas leido: {masLeidoHist.Titulo} ({masLeidoHist.Autor})" 
+            : "Mas leido: -";
 
         BtnConsultarMes_Click(null, null);
 
